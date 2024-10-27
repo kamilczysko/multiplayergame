@@ -1,4 +1,4 @@
-package com.waldi.rocket
+package com.waldi.rocket.game.gameworld.objects
 
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.CircleShape

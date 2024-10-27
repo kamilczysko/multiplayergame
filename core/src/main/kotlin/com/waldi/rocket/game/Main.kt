@@ -1,5 +1,6 @@
-package com.waldi.rocket
+package com.waldi.rocket.game
 
+import com.waldi.rocket.game.gameworld.GameWorld
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.async.KtxAsync

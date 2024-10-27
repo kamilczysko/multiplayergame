@@ -4,7 +4,7 @@ package com.waldi.rocket.lwjgl3
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import com.waldi.rocket.Main
+import com.waldi.rocket.game.Main
 
 /** Launches the desktop (LWJGL3) application. */
 fun main() {
