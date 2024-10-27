@@ -26,7 +26,6 @@ class GameWorld {
     val font: BitmapFont = BitmapFont();
 
     private val gameState: GameState;
-    private val rockets: HashMap<Short, Rocket>;
     private val rocketsToMove: HashSet<Short>;
 
     init {
@@ -34,9 +33,9 @@ class GameWorld {
         camera.zoom += 0.1f;
         camera.update();
         debug.isDrawVelocities = true;
+        world.setContactListener(GameContactListener());
 
         gameState = InMemoryGameState();
-        rockets = HashMap<Short, Rocket>();
         rocketsToMove = HashSet();
 
         generate(world);
@@ -51,49 +50,48 @@ class GameWorld {
     fun addPlayer(name: String): Short {
         val newPlayerId = gameState.addPlayer(name);
 
-        val newRocket = Rocket(newPlayerId, name);
+        val newRocket = gameState.getPlayer(newPlayerId);
         newRocket.addRocketToWorld((Math.random() * PLATFORM_WIDTH_HALF).toFloat(), 1.0f, world);
-
-        rockets[newPlayerId] = newRocket;
-
         return newPlayerId;
     }
 
     fun render() {
-//        if (Gdx.input.isTouched) {
-//
-//            val rocketToFly = rockets.get(251)!!;
-//
-//            var mousePosition = Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
-//            camera.unproject(mousePosition)
-//            val targetDirection = (vec2(mousePosition.x, mousePosition.y).sub(rocketToFly.rocketBody.position).nor());
-//            var currentDir = vec2(cos(rocketToFly.rocketBody.angle), sin(rocketToFly.rocketBody.angle));
-//            currentDir = (currentDir.add(targetDirection.sub(currentDir)))
-//            val angle = atan2(currentDir.x, currentDir.y)
-//
-//            rocketToFly.flyRocket(angle);
-//        }
-//
-//        if(Gdx.input.isKeyPressed(Keys.W)){
-//            val rocketToFly = rockets.get(253)!!;
-//
-//            var mousePosition = Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
-//            camera.unproject(mousePosition)
-//            val targetDirection = (vec2(mousePosition.x, mousePosition.y).sub(rocketToFly.rocketBody.position).nor());
-//            var currentDir = vec2(cos(rocketToFly.rocketBody.angle), sin(rocketToFly.rocketBody.angle));
-//            currentDir = (currentDir.add(targetDirection.sub(currentDir)))
-//            val angle = atan2(currentDir.x, currentDir.y)
-//
-//            rocketToFly.flyRocket(angle);
-//        }
+        if (Gdx.input.justTouched()) {
+            if (rocketsToMove.isEmpty()) {
+                rocketsToMove.add(253);
+            } else {
+                rocketsToMove.clear();
+            }
+        }
+
+        for (id in rocketsToMove) {
+            val rocketToFly = gameState.getPlayer(id);
+            rocketToFly.accelerate();
+        }
+        flyMeToTheMoon(253);
 
         batch.begin();
-        for ((index, rocket) in rockets.values.withIndex()) {
+        for ((index, rocket) in gameState.getAllPlayers().withIndex()) {
             font.draw(batch, "${rocket.name} ${(rocket.fuel * 100).toInt()}%", 10.0f, index * 20.0f + 15.0f);
         }
         batch.end();
 
         world.step(1 / 60f, 6, 2);
         debug.render(world, camera.combined);
+    }
+
+    private fun flyMeToTheMoon(id: Short) {
+        val rocketToFly = gameState.getPlayer(id);
+
+        var mousePosition = Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
+        camera.unproject(mousePosition)
+
+        val rocketBody = rocketToFly.rocketBody
+        val targetDirection = (vec2(mousePosition.x, mousePosition.y).sub(rocketBody.position).nor());
+        var currentDir = vec2(cos(rocketBody.angle), sin(rocketBody.angle));
+        currentDir = (currentDir.add(targetDirection.sub(currentDir)))
+        val angle = atan2(currentDir.x, currentDir.y)
+
+        rocketToFly.rotate(angle);
     }
 }

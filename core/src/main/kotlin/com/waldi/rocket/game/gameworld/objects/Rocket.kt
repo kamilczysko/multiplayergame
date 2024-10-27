@@ -3,11 +3,6 @@ package com.waldi.rocket.game.gameworld.objects
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
-import ktx.math.vec2
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-
 const val ROCKET_WIDTH = 0.15f
 const val ROCKET_HEIGHT = 0.6f
 const val THRUST_FORCE = 6.5f

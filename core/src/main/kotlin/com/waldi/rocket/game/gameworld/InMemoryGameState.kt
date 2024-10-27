@@ -37,5 +37,6 @@ class InMemoryGameState : GameState {
 
     override fun getPlayer(name: String): Rocket = gameState.values.stream().filter { player -> player.name == name }.findFirst().orElseThrow{ IllegalStateException("Player not found")};
 
-    override fun getPlayer(id: Short) = gameState[id];
+    override fun getPlayer(id: Short) : Rocket = gameState[id]!!;
+    override fun getAllPlayers(): Set<Rocket> = gameState.values.toSet();
 }

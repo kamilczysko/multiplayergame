@@ -9,9 +9,9 @@ const val PLATFORM_WIDTH_HALF = 20.0f
 private const val BOX_SIZE = .7f
 
 fun generate(world: World) {
-    Platform(0.0f, 0.0f, PLATFORM_WIDTH_HALF, 0.1f, world);
-    Platform(-20.0f, 70.0f, 0.1f, 70.0f, world);
-    Platform(20.0f, 70.0f, 0.1f, 70.0f, world);
+    Platform(0.0f, 0.0f, PLATFORM_WIDTH_HALF, 1.0f, world);
+    Platform(20.0f, 70.0f, 1.0f, 70.0f, world);
+    Platform(-20.0f, 70.0f, 1.0f, 70.0f, world);
 
     val numberOfLayers = (8..14).random()
     val yOffset = 140.0f/numberOfLayers;
@@ -27,7 +27,7 @@ fun generate(world: World) {
 private fun createLayerSingle(y: Float = 8.0f, world: World) {
     val width = (4..10).random().toFloat();
     val x = ((0..(PLATFORM_WIDTH_HALF * 2).toInt()).random()).toFloat() - PLATFORM_WIDTH_HALF;
-    Platform(x, y + (0..2).random(), width, 0.1f, world)
+    Platform(x, y + (0..2).random(), width, .5f, world)
 //    val seed = (1..15).random()
 //    val wallXPos = x + (1..width.toInt() - 2).random()
 //    if(seed % 2 == 0) {
