@@ -3,6 +3,8 @@ package com.waldi.rocket.server
 import com.waldi.rocket.server.codec.GameDecoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerHandler
+import com.waldi.rocket.server.codec.playerlistchange.PlayerListChangeEncoder
+import com.waldi.rocket.server.gamestate.GameState
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.http.HttpHeaderNames.WEBSOCKET_PROTOCOL
@@ -12,7 +14,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler
 import io.netty.handler.stream.ChunkedWriteHandler
 import java.net.InetAddress
 
-class SocketChannelInitializer : ChannelInitializer<SocketChannel>() {
+class SocketChannelInitializer(private val gameState: GameState) : ChannelInitializer<SocketChannel>() {
 
     override fun initChannel(channel: SocketChannel) {
         val host = InetAddress.getLocalHost();
@@ -24,6 +26,7 @@ class SocketChannelInitializer : ChannelInitializer<SocketChannel>() {
 
         pipeline.addLast(GameDecoder())
         pipeline.addLast(CreateNewPlayerEncoder())
-        pipeline.addLast(CreateNewPlayerHandler())
+        pipeline.addLast(PlayerListChangeEncoder())
+        pipeline.addLast(CreateNewPlayerHandler(gameState))
     }
 }

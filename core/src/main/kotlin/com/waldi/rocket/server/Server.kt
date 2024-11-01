@@ -1,5 +1,9 @@
 package com.waldi.rocket.server
 
+import com.waldi.rocket.server.codec.playerlistchange.PlayerListChangeDispatcher
+import com.waldi.rocket.server.gamestate.GameState
+import com.waldi.rocket.server.gamestate.InMemoryGameState
+import com.waldi.rocket.server.gamestate.events.GameStateEventType
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelOption
@@ -9,6 +13,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 private const val PORT = 60231;
 
 fun runServer() {
+    val gameState: GameState = InMemoryGameState.getInstance();
+    gameState.addListener(PlayerListChangeDispatcher(), GameStateEventType.PLAYER_LIST_CHANGE);
+
+    bootstrapServer(gameState)
+}
+
+private fun bootstrapServer(gameState: GameState) {
     val bossGroup = NioEventLoopGroup(1);
     val workGroup = NioEventLoopGroup(); //poczytać co to jest
 
@@ -18,7 +29,7 @@ fun runServer() {
         .localAddress(PORT)
         .option(ChannelOption.SO_BACKLOG, 128) //poczytać
         .childOption(ChannelOption.SO_KEEPALIVE, true)
-        .childHandler(SocketChannelInitializer()); //poczytać
+        .childHandler(SocketChannelInitializer(gameState)); //poczytać
 
     try {
         val sync: ChannelFuture = bootstrap.bind().sync();
@@ -27,7 +38,6 @@ fun runServer() {
         bossGroup.shutdownGracefully();
         workGroup.shutdownGracefully();
     }
-
 }
 
 fun main() {
