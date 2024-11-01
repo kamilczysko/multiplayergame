@@ -77,6 +77,33 @@ function decodeUserData(bytes) {
     }
 }
 
+function decodeNewUser(bytes) {
+    const dataView = new DataView(new Uint8Array(bytes).buffer);
+    const buffer = new Uint8Array(bytes).buffer;
+
+    const sessionIdLength = dataView.getUint8(1);
+    const sessionIdBytes = new Uint8Array(buffer, 2, sessionIdLength);
+    const sessionId = new TextDecoder("utf-8").decode(sessionIdBytes);
+
+    const playerIdIdBytes = new Uint8Array(buffer, 2 + sessionIdLength, 5);
+    const playerId = new TextDecoder("utf-8").decode(playerIdIdBytes);
+
+    const nameBytes = new Uint8Array(buffer, 2 + sessionIdLength + 5)
+    const name = new TextDecoder("utf-8").decode(nameBytes);
+
+    document.cookie = `name=${name};`
+    document.cookie = `sessionId=${sessionId};`
+    document.cookie = `playerId=${playerId};`;
+    highlightOnScoreboard(playerId);
+}
+
+function highlightOnScoreboard(playerId) {
+    const playersScore = document.getElementById(playerId);
+    if (playersScore) {
+        playersScore.className = "playerScore me"
+    }
+}
+
 function drawScoreBoard(playerId, name, points) {
     const playersScore = document.getElementById(playerId);
     if (!playersScore) {
@@ -107,25 +134,6 @@ function addNewScore(playerId, name, points) {
     console.log(name)
 
     document.getElementById("scoreBoardList").appendChild(li);
-}
-
-function decodeNewUser(bytes) {
-    const dataView = new DataView(new Uint8Array(bytes).buffer);
-    const buffer = new Uint8Array(bytes).buffer;
-
-    const sessionIdLength = dataView.getUint8(1);
-    const sessionIdBytes = new Uint8Array(buffer, 2, sessionIdLength);
-    const sessionId = new TextDecoder("utf-8").decode(sessionIdBytes);
-
-    const playerIdIdBytes = new Uint8Array(buffer, 2 + sessionIdLength, 5);
-    const playerId = new TextDecoder("utf-8").decode(playerIdIdBytes);
-
-    const nameBytes = new Uint8Array(buffer, 2 + sessionIdLength + 5)
-    const name = new TextDecoder("utf-8").decode(nameBytes);
-
-    document.cookie = `name=${name};`
-    document.cookie = `sessionId=${sessionId};`
-    document.cookie = `playerId=${playerId};`;
 }
 
 function getSessionFromCookie() {
