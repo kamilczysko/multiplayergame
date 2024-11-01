@@ -14,7 +14,7 @@ private const val PORT = 60231;
 
 fun runServer() {
     val gameState: GameState = InMemoryGameState.getInstance();
-    gameState.addListener(PlayerListChangeDispatcher(), GameStateEventType.PLAYER_LIST_CHANGE);
+    gameState.addListener(PlayerListChangeDispatcher(), GameStateEventType.PLAYER_LIST_UPDATE);
 
     bootstrapServer(gameState)
 }

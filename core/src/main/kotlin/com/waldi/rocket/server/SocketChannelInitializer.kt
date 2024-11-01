@@ -3,7 +3,6 @@ package com.waldi.rocket.server
 import com.waldi.rocket.server.codec.GameDecoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerHandler
-import com.waldi.rocket.server.codec.playerlistchange.PlayerListChangeEncoder
 import com.waldi.rocket.server.gamestate.GameState
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
@@ -26,7 +25,6 @@ class SocketChannelInitializer(private val gameState: GameState) : ChannelInitia
 
         pipeline.addLast(GameDecoder())
         pipeline.addLast(CreateNewPlayerEncoder())
-        pipeline.addLast(PlayerListChangeEncoder())
         pipeline.addLast(CreateNewPlayerHandler(gameState))
     }
 }

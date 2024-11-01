@@ -30,15 +30,16 @@ class InMemoryGameState private constructor(): GameState {
         sessionIdToPlayer.remove(sessionId);
     }
 
-    override fun updatePlayer(prevSessionId: String, actualSessionId: String, newName: String, actualChannel: Channel) {
+    override fun updatePlayerSession(prevSessionId: String, actualSessionId: String, newName: String, actualChannel: Channel) {
         val player = sessionIdToPlayer[prevSessionId] ?: return;
         player.playerSessionId = actualSessionId;
         player.playerName = newName;
         player.playerChannel = actualChannel;
 
         sessionIdToPlayer.remove(prevSessionId);
-        sessionManager.notify(GameStateEventType.PLAYER_LIST_CHANGE, sessionIdToPlayer.values, listOf(player));
         sessionIdToPlayer[actualSessionId] = player;
+        sessionManager.notify(GameStateEventType.PLAYER_LIST_UPDATE, listOf(player), sessionIdToPlayer.values);
+
     }
 
     override fun getPlayerGameId(sessionId: String): String? {
@@ -47,9 +48,9 @@ class InMemoryGameState private constructor(): GameState {
 
     override fun addNewPlayer(name: String, newSessionId: String, channel: Channel): Player {
         val newPlayer = Player(name, newSessionId, channel);
-        sessionManager.notify(GameStateEventType.PLAYER_LIST_CHANGE, sessionIdToPlayer.values, listOf(newPlayer));
+        sessionManager.notify(GameStateEventType.PLAYER_LIST_UPDATE, sessionIdToPlayer.values, listOf(newPlayer));
         sessionIdToPlayer[newSessionId] = newPlayer;
-        sessionManager.notify(GameStateEventType.PLAYER_LIST_CHANGE, listOf(newPlayer), sessionIdToPlayer.values);
+        sessionManager.notify(GameStateEventType.PLAYER_LIST_UPDATE, listOf(newPlayer), sessionIdToPlayer.values);
         return newPlayer;
     }
 

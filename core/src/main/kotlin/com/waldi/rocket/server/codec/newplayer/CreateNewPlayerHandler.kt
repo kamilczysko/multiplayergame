@@ -22,7 +22,7 @@ class CreateNewPlayerHandler(private val gameState: GameState) : SimpleChannelIn
             ctx.writeAndFlush(CreateNewPlayer(freshPlayer.playerName, freshPlayer.gameId, freshPlayer.playerSessionId));
         } else {
             val gameId = gameState.getPlayerGameId(oldSession) ?: return;
-            gameState.updatePlayer(oldSession, newSessionId, newPlayer.name, channel);
+            gameState.updatePlayerSession(oldSession, newSessionId, newPlayer.name, channel);
             ctx.writeAndFlush(CreateNewPlayer(newPlayer.name, gameId, newSessionId));
         }
     }

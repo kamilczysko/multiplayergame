@@ -1,5 +1,5 @@
 package com.waldi.rocket.server.gamestate.events
 
 enum class GameStateEventType {
-    PLAYER_LIST_CHANGE
+    PLAYER_LIST_UPDATE
 }
