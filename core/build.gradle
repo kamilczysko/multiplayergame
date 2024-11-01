@@ -36,8 +36,10 @@ dependencies {
   api "net.onedaybeard.artemis:artemis-odb:$artemisOdbVersion"
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+  implementation 'io.netty:netty-all:5.0.0.Alpha2'
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 }
+

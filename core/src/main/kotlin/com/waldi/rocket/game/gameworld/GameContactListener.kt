@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener
 import com.badlogic.gdx.physics.box2d.Manifold
 
 class GameContactListener:ContactListener {
+
     override fun beginContact(p0: Contact?) {
     }
 

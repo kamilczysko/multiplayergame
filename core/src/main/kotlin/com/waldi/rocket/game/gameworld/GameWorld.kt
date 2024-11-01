@@ -1,7 +1,6 @@
 package com.waldi.rocket.game.gameworld
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -10,9 +9,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
-import com.waldi.rocket.game.gameworld.objects.Rocket
 import ktx.math.vec2
-import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin

@@ -1,0 +1,46 @@
+:root {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+.loginInput {
+    display: flex;
+}
+
+header {
+    display: flex;
+    align-items:center;
+    justify-content: space-between;
+
+}
+
+.playerInfo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.scoreBoard {
+    background: red;
+    position: fixed;
+    left: 0px;
+    top: 5vh;
+    width: 10dvh;
+}
+
+.scoreBoardList {
+    background: green;
+    padding-left: 10px;
+}
+
+.playerScore {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: white;
+    width: 100%;
+}
+
+.me {
+    font-weight: bold;
+}
