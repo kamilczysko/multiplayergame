@@ -1,5 +1,6 @@
 package com.waldi.rocket.server
 
+import com.waldi.rocket.server.codec.playerlistchange.PlayerLeaveDispatcher
 import com.waldi.rocket.server.codec.playerlistchange.PlayerListChangeDispatcher
 import com.waldi.rocket.server.gamestate.GameState
 import com.waldi.rocket.server.gamestate.InMemoryGameState
@@ -15,7 +16,7 @@ private const val PORT = 60231;
 fun runServer() {
     val gameState: GameState = InMemoryGameState.getInstance();
     gameState.addListener(PlayerListChangeDispatcher(), GameStateEventType.PLAYER_LIST_UPDATE);
-
+    gameState.addListener(PlayerLeaveDispatcher(), GameStateEventType.PLAYER_LEAVE);
     bootstrapServer(gameState)
 }
 

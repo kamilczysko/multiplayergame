@@ -19,6 +19,13 @@ function joinGame() {
     makeConnection();
 }
 
+onfocus = () => {
+    if(socket !== null && socket.readyState === WebSocket.CLOSED) {
+        console.log("Connection was closed. Reconnecting..")
+        makeConnection();
+    }
+}
+
 function makeConnection() {
     socket = new WebSocket("ws://127.0.0.1:60231/game");
     socket.binaryType = "arraybuffer";
@@ -52,9 +59,22 @@ function makeConnection() {
             case 0x02:
                 decodeUserData(event.data);
                 break;
-
+            case 0x03:
+                decodePlayerLeave(event.data);
+                break;
         }
+    }
+}
 
+function decodePlayerLeave(bytes) {
+    console.log("got message 3")
+    const buffer = new Uint8Array(bytes).buffer;
+    const dataView = new DataView(buffer);
+    let mark = 1;
+    while (mark < dataView.byteLength) {
+        const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
+        mark += 5;
+        document.getElementById(playerId).remove();
     }
 }
 
@@ -94,6 +114,7 @@ function decodeNewUser(bytes) {
     document.cookie = `name=${name};`
     document.cookie = `sessionId=${sessionId};`
     document.cookie = `playerId=${playerId};`;
+
     highlightOnScoreboard(playerId);
 }
 
@@ -109,7 +130,7 @@ function drawScoreBoard(playerId, name, points) {
     if (!playersScore) {
         addNewScore(playerId, name, points);
     } else {
-        playersScore.getElementsByClassName("scoreBoardPoints").innerText = points;
+        playersScore.getElementsByClassName("scoreBoardPoints")[0].innerText = points;
     }
 }
 
@@ -131,7 +152,6 @@ function addNewScore(playerId, name, points) {
 
     li.appendChild(nameElement);
     li.appendChild(pointsElement);
-    console.log(name)
 
     document.getElementById("scoreBoardList").appendChild(li);
 }
@@ -159,6 +179,19 @@ function getCookieValue(key) {
 }
 
 function leaveGame() {
+    const playerIdFromCookie = getCookieValue("playerId");
+    if(!playerIdFromCookie) {
+        return;
+    }
+    const playerId = new TextEncoder().encode(playerIdFromCookie);
+    const buffer = new Uint8Array(1 + playerId.length);
+    buffer[0] = 0x03;
+    buffer.set(playerId, 1, playerId.length)
+
+    socket.send(buffer);
+
     setCookie("sessionId", "")
     setCookie("playerId", "")
+
+    document.getElementById("scoreBoardList").innerHTML = ""
 }

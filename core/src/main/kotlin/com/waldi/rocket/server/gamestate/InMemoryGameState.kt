@@ -27,7 +27,9 @@ class InMemoryGameState private constructor(): GameState {
     }
 
     override fun removePlayer(sessionId: String) {
+        val playerToRemote = sessionIdToPlayer[sessionId] ?: return;
         sessionIdToPlayer.remove(sessionId);
+        sessionManager.notify(GameStateEventType.PLAYER_LEAVE, sessionIdToPlayer.values, listOf(playerToRemote))
     }
 
     override fun updatePlayerSession(prevSessionId: String, actualSessionId: String, newName: String, actualChannel: Channel) {

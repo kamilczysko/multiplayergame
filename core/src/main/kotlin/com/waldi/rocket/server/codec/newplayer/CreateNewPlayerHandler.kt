@@ -11,6 +11,10 @@ class CreateNewPlayerHandler(private val gameState: GameState) : SimpleChannelIn
     }
 
     override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
+        if (msg !is CreateNewPlayer) {
+            ctx?.fireChannelRead(msg);
+            return;
+        }
         val channel = ctx?.channel() ?: return;
         val newSessionId = channel.id()?.asShortText() ?: return
 
