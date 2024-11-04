@@ -1,4 +1,4 @@
-package com.waldi.rocket.game.gameworld
+package com.waldi.rocket.gameengine.gameworld
 
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.ContactImpulse

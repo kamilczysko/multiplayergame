@@ -62,5 +62,4 @@ class InMemoryGameState private constructor(): GameState {
         return sessionIdToPlayer.values.toList();
     }
 
-
 }

@@ -4,7 +4,7 @@ package com.waldi.rocket.lwjgl3
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import com.waldi.rocket.game.Main
+import com.waldi.rocket.gameengine.Main
 
 /** Launches the desktop (LWJGL3) application. */
 fun main() {
@@ -13,7 +13,7 @@ fun main() {
       return
     Lwjgl3Application(Main(), Lwjgl3ApplicationConfiguration().apply {
         setTitle("RocketGame")
-        setWindowedMode(1024, 780)
+        setWindowedMode(560, 1324)
         setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))
     })
 }

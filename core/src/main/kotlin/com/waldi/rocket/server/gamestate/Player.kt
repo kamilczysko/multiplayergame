@@ -5,9 +5,6 @@ import java.util.UUID
 
 class Player(private var name: String, private var sessionId: String, private var channel: Channel) {
     val gameId: String = UUID.randomUUID().mostSignificantBits.toString().replace("-", "").take(5)
-    private var _points: Int = 0;
-
-    val points: Int get() = this._points;
 
     var playerName: String
         get() = this.name;
@@ -22,8 +19,5 @@ class Player(private var name: String, private var sessionId: String, private va
         set(newChannel) { this.channel = newChannel; }
 
     val id: String get() = this.gameId;
-
-    fun addPoint() {
-        this._points++; }
 
 }

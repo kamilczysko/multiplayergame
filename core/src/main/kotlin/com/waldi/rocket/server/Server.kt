@@ -36,11 +36,12 @@ private fun bootstrapServer(gameState: GameState) {
         val sync: ChannelFuture = bootstrap.bind().sync();
         sync.channel().closeFuture().sync();
     } finally {
+
         bossGroup.shutdownGracefully();
         workGroup.shutdownGracefully();
     }
 }
 
 fun main() {
-    runServer();
+    runServer()
 }

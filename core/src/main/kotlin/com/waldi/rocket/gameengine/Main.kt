@@ -1,12 +1,15 @@
-package com.waldi.rocket.game
+package com.waldi.rocket.gameengine
 
-import com.waldi.rocket.game.gameworld.GameWorld
+import com.waldi.rocket.gameengine.gameworld.GameWorld
+import com.waldi.rocket.gameengine.enginestate.EngineState
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.async.KtxAsync
 
 class Main : KtxGame<KtxScreen>() {
     override fun create() {
+//        runServer();
+
         KtxAsync.initiate()
 
         addScreen(FirstScreen())
@@ -15,7 +18,8 @@ class Main : KtxGame<KtxScreen>() {
 }
 
 class FirstScreen : KtxScreen {
-    private val gameWorld = GameWorld();
+    private val engineState = EngineState();
+    private val gameWorld = GameWorld(engineState);
 
     override fun render(delta: Float) {
         gameWorld.render();

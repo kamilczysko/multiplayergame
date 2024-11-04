@@ -12,7 +12,7 @@ import java.util.stream.Collectors
 class PlayerListChangeDispatcher : GameStateListener {
     override fun update(playersToNotify: Collection<Player>, changedPlayers: Collection<Player>) {
         val dataToSend = changedPlayers.stream()
-            .map { player -> PlayerData(player.playerName, player.gameId, player.points) }
+            .map { player -> PlayerData(player.playerName, player.gameId) }
             .collect(Collectors.toList())
 
         val encodedDataToSend = encodeMessage(dataToSend);
@@ -35,7 +35,6 @@ class PlayerListChangeDispatcher : GameStateListener {
             buffer.writeByte(nameBytes.size)
             buffer.writeBytes(nameBytes)
             buffer.writeBytes(p.gameId.toByteArray())
-            buffer.writeByte(p.points)
         }
         return buffer;
     }

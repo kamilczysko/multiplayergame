@@ -57,7 +57,7 @@ function makeConnection() {
                 decodeNewUser(event.data);
                 break;
             case 0x02:
-                decodeUserData(event.data);
+                decodeUserListData(event.data);
                 break;
             case 0x03:
                 decodePlayerLeave(event.data);
@@ -78,7 +78,7 @@ function decodePlayerLeave(bytes) {
     }
 }
 
-function decodeUserData(bytes) {
+function decodeUserListData(bytes) {
     const buffer = new Uint8Array(bytes).buffer;
     const dataView = new DataView(buffer);
     let mark = 1;
@@ -90,10 +90,8 @@ function decodeUserData(bytes) {
         mark = mark + numberOfBytesForName;
         const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
         mark += 5; //5 is equal to playerId.length
-        const points = dataView.getUint8(mark);
-        mark++;
-        players[playerId] = { "playerName": name, "points": points }
-        drawScoreBoard(playerId, name, points);
+        players[playerId] = { "playerName": name, "points": 0 }
+        drawScoreBoard(playerId, name, 0);
     }
 }
 
