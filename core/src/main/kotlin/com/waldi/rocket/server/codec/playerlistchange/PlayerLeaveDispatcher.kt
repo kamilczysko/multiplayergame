@@ -8,7 +8,7 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame
 
 class PlayerLeaveDispatcher : GameStateListener {
     override fun update(playersToNotify: Collection<Player>, changedPlayers: Collection<Player>) {
-        changedPlayers.stream().findFirst().map { encode(it) }
+        changedPlayers.stream().findFirst().map { encode(it).retain() }
             .ifPresent { playerId ->
                 send(playerId, playersToNotify)
             }
@@ -18,7 +18,7 @@ class PlayerLeaveDispatcher : GameStateListener {
     private fun send(bytesToSend: ByteBuf, playersToNotify: Collection<Player>) {
         try {
             for (p in playersToNotify) {
-                p.playerChannel.writeAndFlush(BinaryWebSocketFrame(bytesToSend.retain()))
+                p.playerChannel.writeAndFlush(BinaryWebSocketFrame(bytesToSend))
             }
         } finally {
             bytesToSend.release();

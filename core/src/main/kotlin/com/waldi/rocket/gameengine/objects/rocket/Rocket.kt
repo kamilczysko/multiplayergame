@@ -1,7 +1,8 @@
-package com.waldi.rocket.gameengine.objects
+package com.waldi.rocket.gameengine.objects.rocket
 
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import com.waldi.rocket.gameengine.objects.WorldObject
 
 const val ROCKET_WIDTH = 0.15f
 const val ROCKET_HEIGHT = 0.6f
@@ -13,7 +14,7 @@ class Rocket(val id: String, val name: String, private var x: Float, private var
     var fuel: Float = 1.0f;
     var points: Short = 0;
 
-    lateinit var rocketBody: Body;
+    lateinit var body: Body;
     private lateinit var rocketFixtureDef: FixtureDef;
 
     fun addPoint() {
@@ -29,19 +30,19 @@ class Rocket(val id: String, val name: String, private var x: Float, private var
     }
 
     fun accelerate() {
-        val angle = rocketBody.angle
+        val angle = body.angle
         val thrustForce = Vector2(0.0f, THRUST_FORCE).rotateRad(angle);
-        val enginePosition = rocketBody.worldCenter.add(Vector2(0.0f, ROCKET_HEIGHT / 2).rotateRad(angle));
-        rocketBody.applyForce(thrustForce, enginePosition, true);
+        val enginePosition = body.worldCenter.add(Vector2(0.0f, ROCKET_HEIGHT / 2).rotateRad(angle));
+        body.applyForce(thrustForce, enginePosition, true);
         rocketFixtureDef.density *= fuel;
         fuel -= FUEL_CONSUMPTION;
     }
 
     fun rotate(angle: Float) {
-        if (rocketBody.linearVelocity.x == 0.0f || rocketBody.linearVelocity.y == 0.0f) {
+        if (body.linearVelocity.x == 0.0f || body.linearVelocity.y == 0.0f) {
             return
         }
-        rocketBody.setTransform(rocketBody.position, -angle);
+        body.setTransform(body.position, -angle);
     }
 
     override fun addToWorld(world: World) {
@@ -49,7 +50,7 @@ class Rocket(val id: String, val name: String, private var x: Float, private var
         dynamicBodyDef.type = BodyDef.BodyType.DynamicBody;
         dynamicBodyDef.position.set(x, y);
 
-        rocketBody = world.createBody(dynamicBodyDef);
+        body = world.createBody(dynamicBodyDef);
 
         val boxShape = PolygonShape()
         boxShape.setAsBox(ROCKET_WIDTH, ROCKET_HEIGHT)
@@ -60,11 +61,11 @@ class Rocket(val id: String, val name: String, private var x: Float, private var
         rocketFixtureDef.density = 1f;
         rocketFixtureDef.friction = .95f;
 
-        rocketBody.angularDamping = .7f;
+        body.angularDamping = .7f;
 
-        rocketBody.isFixedRotation = false;
+        body.isFixedRotation = false;
 
-        val rocketBodyFixture = rocketBody.createFixture(rocketFixtureDef);
+        val rocketBodyFixture = body.createFixture(rocketFixtureDef);
 
         rocketBodyFixture.userData = "ROCKET_$id"
 
@@ -72,11 +73,11 @@ class Rocket(val id: String, val name: String, private var x: Float, private var
     }
 
     override fun deleteFromWorld(world: World) {
-        world.destroyBody(rocketBody);
+        world.destroyBody(body);
     }
 
     override fun getPosition(): Pair<Float, Float> {
-        return Pair(rocketBody.position.x, rocketBody.position.y);
+        return Pair(body.position.x, body.position.y);
     }
 
     fun getDimension(): Pair<Float, Float> {
@@ -84,6 +85,6 @@ class Rocket(val id: String, val name: String, private var x: Float, private var
     }
 
     fun getAngleRad(): Float {
-        return rocketBody.angle;
+        return body.angle;
     }
 }

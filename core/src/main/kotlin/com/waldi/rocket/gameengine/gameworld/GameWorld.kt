@@ -8,8 +8,9 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.waldi.rocket.gameengine.enginestate.EngineState
+import com.waldi.rocket.gameengine.objects.rocket.RocketListener
 
-class GameWorld(val engineState: EngineState) {
+class GameWorld(val engineState: EngineState, val rocketListener: RocketListener?) {
     val gravity = Vector2(0.0f, -10.0f)
     val world: World = World(gravity, true);
     val camera: OrthographicCamera = OrthographicCamera(100f, 240f);
@@ -22,15 +23,16 @@ class GameWorld(val engineState: EngineState) {
         camera.zoom += 0.1f;
         camera.update();
         debug.isDrawVelocities = true;
-        world.setContactListener(GameContactListener());
+        world.setContactListener(GameContactListener(rocketListener));
 
-        engineState.initState();
+        engineState.initNewMap();
         engineState.addPlatformsToTheWorld(world);
         engineState.addMoonToTheWorld(world);
 
+        engineState.onAddObjectToTheWorld { worldObject -> worldObject.addToWorld(world) }
+        engineState.onDestroyObject { worldObject -> worldObject.addToWorld(world) }
         engineState.onNewRocket{  rocket -> rocket.addToWorld(world) }
         engineState.onRemoveRocket{ rocket -> rocket.deleteFromWorld(world)}
-
     }
 
     fun render() {

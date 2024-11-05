@@ -6,59 +6,90 @@ import com.waldi.rocket.gameengine.gameworld.GameWorldCommand
 import com.waldi.rocket.gameengine.gameworld.generate
 import com.waldi.rocket.gameengine.objects.Moon
 import com.waldi.rocket.gameengine.objects.Platform
-import com.waldi.rocket.gameengine.objects.Rocket
-import com.waldi.rocket.shared.GameEventBus
+import com.waldi.rocket.gameengine.objects.rocket.Rocket
+import com.waldi.rocket.shared.gamebus.GameEventBus
+import com.waldi.rocket.shared.gamebus.RocketData
+import com.waldi.rocket.shared.gamebus.MapData
+import com.waldi.rocket.shared.gamebus.MoonData
+import com.waldi.rocket.shared.gamebus.PlatformData
 import ktx.math.random
+import java.util.UUID
 import java.util.concurrent.ConcurrentSkipListMap
+import java.util.stream.Collectors
 
-class EngineState() {
+class EngineState() : GameEventBus {
     private val rockets: ConcurrentSkipListMap<String, Rocket> = ConcurrentSkipListMap<String, Rocket>();
     private lateinit var basePlatforms: List<Platform>;
     private lateinit var platforms: List<Platform>;
     private lateinit var moon: Moon;
+    private lateinit var mapHash: String;
 
-    private lateinit var onNewRocket: GameWorldCommand;
-    private lateinit var onRemoveRocket: GameWorldCommand;
+    private lateinit var onNewRocketCommand: GameWorldCommand;
+    private lateinit var onRemoveRocketCommand: GameWorldCommand;
+    private lateinit var onRemoveObjectFromTheWorld: GameWorldCommand;
+    private lateinit var onAddObjectToTheWorldCommand: GameWorldCommand;
 
-
-    fun initState() {
+    override fun initNewMap() {
         val (basePlatforms, platforms, moon) = generate();
         this.basePlatforms = basePlatforms;
         this.platforms = platforms;
         this.moon = moon;
+        this.mapHash = UUID.randomUUID().mostSignificantBits.toString().replace("-", "").take(5);
     }
 
-    fun getBasePlatforms(): List<Platform> {
-        return ArrayList(this.basePlatforms);
+    override fun resetMap() {
+        basePlatforms.stream().forEach { p -> onRemoveObjectFromTheWorld.execute(p)  };
+        platforms.stream().forEach { p -> onRemoveObjectFromTheWorld.execute(p) };
+        onRemoveObjectFromTheWorld.execute(moon);
+        initNewMap();
+        rockets.keys.stream()
+            .forEach { id -> resetRocket(id) }
     }
 
-    fun getPlatforms(): List<Platform> {
-        return ArrayList(this.platforms);
+    override fun getMapData(): MapData {
+        val platforms = mutableListOf<PlatformData>();
+        for (platform in this.basePlatforms) {
+            platforms.add(PlatformData(platform.x, platform.y, platform.width, platform.height))
+        }
+        for (platform in this.platforms) {
+            platforms.add(PlatformData(platform.x, platform.y, platform.width, platform.height))
+        }
+        val moon = MoonData(moon.radius, moon.x, moon.y);
+
+        return MapData(platforms, moon, mapHash);
     }
 
-    fun getMoon(): Moon {
-        return this.moon;
-    }
-
-    fun addRocket(id: String, name: String) {
+    override fun addRocket(id: String, name: String) {
         val newRocket = Rocket(id, name, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), .6f)
         rockets.putIfAbsent(id, newRocket);
-        onNewRocket.execute(newRocket);
+        onNewRocketCommand.execute(newRocket); }
+
+    override fun deleteRocket(playerId: String) {
+        val rocket: Rocket = rockets[playerId] ?: return;
+        onRemoveRocketCommand.execute(rocket)
+        rockets.remove(playerId); }
+
+    override fun getRocketsData(): List<RocketData> {
+        return rockets.values.stream()
+            .map { rocket ->
+                RocketData(
+                    rocket.body.position.x,
+                    rocket.body.position.y,
+                    rocket.body.position.angleRad(),
+                    rocket.id,
+                    rocket.fuel
+                )
+            }
+            .collect(Collectors.toList());
     }
 
-    fun removeRocket(id: String) {
-        val rocket: Rocket = rockets[id] ?: return;
-        onRemoveRocket.execute(rocket)
-        rockets.remove(id);
-    }
-
-    fun resetRocket(id: String) {
-        val rocket: Rocket = rockets[id] ?: return;
-        onRemoveRocket.execute(rocket)
+    override fun resetRocket(playerId: String) {
+        val rocket: Rocket = rockets[playerId] ?: return;
+        onRemoveRocketCommand.execute(rocket)
         val newRocket =
             Rocket(rocket.id, rocket.name, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), .6f)
-        rockets[id] = newRocket;
-        onNewRocket.execute(newRocket);
+        rockets[playerId] = newRocket;
+        onNewRocketCommand.execute(newRocket);
     }
 
     fun addPlatformsToTheWorld(world: World) {
@@ -70,21 +101,19 @@ class EngineState() {
         this.moon.addToWorld(world);
     }
 
-    fun clearGame(world: World) {
-        basePlatforms.stream().forEach { p -> p.deleteFromWorld(world) };
-        platforms.stream().forEach { p -> p.deleteFromWorld(world) };
-        moon.deleteFromWorld(world);
-        initState();
-        rockets.keys.stream()
-            .forEach { id -> resetRocket(id) }
-    }
-
     fun onNewRocket(command: GameWorldCommand) {
-        onNewRocket = command;
+        onNewRocketCommand = command;
     }
 
     fun onRemoveRocket(command: GameWorldCommand) {
-        onRemoveRocket = command;
+        onRemoveRocketCommand = command;
+    }
+
+    fun onAddObjectToTheWorld (command: GameWorldCommand) {
+        this.onAddObjectToTheWorldCommand = command;
+    }
+    fun onDestroyObject (command: GameWorldCommand) {
+        this.onRemoveObjectFromTheWorld = command;
     }
 
 }
