@@ -1,10 +1,7 @@
 package com.waldi.rocket.server.codec
 
-import com.waldi.rocket.server.codec.leaveplayer.LeavePlayer
 import com.waldi.rocket.server.codec.leaveplayer.LeavePlayerDecoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerDecoder
-import com.waldi.rocket.server.codec.message.Message
-import com.waldi.rocket.server.codec.newplayer.CreateNewPlayer
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageDecoder

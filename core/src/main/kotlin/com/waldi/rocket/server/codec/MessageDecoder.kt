@@ -1,4 +1,4 @@
-package com.waldi.rocket.server.codec.message
+package com.waldi.rocket.server.codec
 
 import io.netty.buffer.ByteBuf
 

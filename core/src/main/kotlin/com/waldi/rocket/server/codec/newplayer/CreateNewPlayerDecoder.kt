@@ -1,6 +1,6 @@
 package com.waldi.rocket.server.codec.newplayer
 
-import com.waldi.rocket.server.codec.message.MessageDecoder
+import com.waldi.rocket.server.codec.MessageDecoder
 import io.netty.buffer.ByteBuf
 import io.netty.util.CharsetUtil
 
