@@ -1,10 +1,13 @@
 package com.waldi.rocket.server.codec.newplayer
 
-import com.waldi.rocket.server.gamestate.GameState
+import com.waldi.rocket.server.gamestate.GameServerState
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
+import mu.two.KotlinLogging
 
-class CreateNewPlayerHandler(private val gameState: GameState) : SimpleChannelInboundHandler<CreateNewPlayer>() {
+class CreateNewPlayerHandler(private val gameServerState: GameServerState) : SimpleChannelInboundHandler<CreateNewPlayer>() {
+
+    private val logger = KotlinLogging.logger{}
 
     override fun messageReceived(p0: ChannelHandlerContext?, p1: CreateNewPlayer?) {
         TODO("Not yet implemented")
@@ -21,11 +24,15 @@ class CreateNewPlayerHandler(private val gameState: GameState) : SimpleChannelIn
         val newPlayer: CreateNewPlayer = msg
         val oldSession = newPlayer.sessionId;
 
-        val freshPlayer = gameState.addOrUpdatePlayer(oldSession, newSessionId, newPlayer.name, channel);
+        val freshPlayer = gameServerState.addOrUpdatePlayer(oldSession, newSessionId, newPlayer.name, channel);
+
+        logger.info { "Create new player or refresh session for $freshPlayer" }
 
         ctx.writeAndFlush(CreateNewPlayer(freshPlayer.playerName, freshPlayer.gameId, freshPlayer.playerSessionId));
 
-        val mapData = gameState.getMapData();
+        logger.info { "Send map data to player ${freshPlayer.gameId}" }
+
+        val mapData = gameServerState.getMapData();
         ctx.writeAndFlush(mapData);
     }
 

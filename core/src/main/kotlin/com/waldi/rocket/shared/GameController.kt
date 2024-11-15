@@ -1,16 +1,16 @@
 package com.waldi.rocket.shared
 
 import com.waldi.rocket.gameengine.gameworld.GameWorld
-import com.waldi.rocket.server.gamestate.GameState
-import com.waldi.rocket.server.gamestate.InMemoryGameState
+import com.waldi.rocket.server.gamestate.GameServerState
+import com.waldi.rocket.server.gamestate.InMemoryGameServerState
 
 class GameController() {
     val gameWorld: GameWorld = GameWorld();
-    val gameState: GameState = InMemoryGameState();
+    val gameServerState: GameServerState = InMemoryGameServerState();
 
     init {
         this.gameWorld.setController(this);
-        this.gameState.setController(this);
+        this.gameServerState.setController(this);
     }
 
     fun initRocket(rocketName: String, rocketId: String) {
@@ -37,7 +37,7 @@ class GameController() {
     }
 
     fun notifyAboutGameState(rocketData: List<RocketPositionData>) {
-        gameState.getAllPlayers().stream().forEach {
+        gameServerState.getAllPlayers().stream().forEach {
             it.playerChannel.writeAndFlush("sdfsdfsf") //todo implement, maybe method to encode also and send
         }
     }

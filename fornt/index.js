@@ -2,7 +2,7 @@ let socket = null;
 const INIT_NEW_PLAYER = 0x01;
 
 const players = new Map()
-const hasActiveSession = getSessionFromCookie() !== "";
+let hasActiveSession = getSessionFromCookie() !== "";
 
 document.getElementById("nameInput").value = getNameFromCookie() || "";
 
@@ -12,7 +12,7 @@ if (hasActiveSession) {
 
 function joinGame() {
     const name = document.getElementById("nameInput").value;
-    if (!name || hasActiveSession) {
+    if (hasActiveSession) {
         console.log("not connecting")
         return;
     }
@@ -20,7 +20,7 @@ function joinGame() {
 }
 
 onfocus = () => {
-    if(socket !== null && socket.readyState === WebSocket.CLOSED) {
+    if (socket !== null && socket.readyState === WebSocket.CLOSED) {
         console.log("Connection was closed. Reconnecting..")
         makeConnection();
     }
@@ -54,20 +54,44 @@ function makeConnection() {
         console.log("got message: " + messageType)
         switch (messageType) {
             case 0x01:
+                console.log("New user response")
                 decodeNewUser(event.data);
                 break;
             case 0x02:
+                console.log("User list message")
                 decodeUserListData(event.data);
                 break;
             case 0x03:
+                console.log("Player left")
                 decodePlayerLeave(event.data);
+                break;
+            case 0x04:
+                console.log("Map info message")
+                decodeMapInfo(event.data);
                 break;
         }
     }
+
+    hasActiveSession = true;
+}
+
+function decodeMapInfo(bytes) {
+    const buffer = new Uint8Array(bytes).buffer;
+    const dataView = new DataView(buffer);
+
+    const moon = {x: dataView.getUint8(1), y: dataView.getUint8(2), radius: dataView.getUint8(3)};
+    const blocks = [];
+    
+    let mark = 4;
+    while (mark < dataView.byteLength) {
+        blocks.push({x: dataView.getUint8(mark), y: dataView.getUint8(++mark), width: dataView.getUint8(++mark), height: dataView.getUint8(++mark)})
+        mark++;
+    }
+
+    
 }
 
 function decodePlayerLeave(bytes) {
-    console.log("got message 3")
     const buffer = new Uint8Array(bytes).buffer;
     const dataView = new DataView(buffer);
     let mark = 1;
@@ -178,7 +202,7 @@ function getCookieValue(key) {
 
 function leaveGame() {
     const playerIdFromCookie = getCookieValue("playerId");
-    if(!playerIdFromCookie) {
+    if (!playerIdFromCookie) {
         return;
     }
     const playerId = new TextEncoder().encode(playerIdFromCookie);
@@ -192,4 +216,6 @@ function leaveGame() {
     setCookie("playerId", "")
 
     document.getElementById("scoreBoardList").innerHTML = ""
+
+    hasActiveSession = false;
 }

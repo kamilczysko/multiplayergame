@@ -1,17 +1,19 @@
 package com.waldi.rocket.server
 
-import com.waldi.rocket.server.gamestate.GameState
+import com.waldi.rocket.server.gamestate.GameServerState
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
+import mu.two.KotlinLogging
 
 private const val PORT = 60231;
 
+private val logger = KotlinLogging.logger {  }
 
-fun bootstrapServer(gameState: GameState) {
-    println("starting server...")
+fun bootstrapServer(gameServerState: GameServerState) {
+    logger.info { "Starting server..." }
     val bossGroup = NioEventLoopGroup(1);
     val workGroup = NioEventLoopGroup();
 
@@ -21,7 +23,7 @@ fun bootstrapServer(gameState: GameState) {
         .localAddress(PORT)
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
-        .childHandler(SocketChannelInitializer(gameState));
+        .childHandler(SocketChannelInitializer(gameServerState));
 
     try {
         val sync: ChannelFuture = bootstrap.bind().sync();

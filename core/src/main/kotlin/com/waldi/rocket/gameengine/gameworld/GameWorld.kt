@@ -12,6 +12,7 @@ import com.waldi.rocket.gameengine.objects.Platform
 import com.waldi.rocket.gameengine.objects.Rocket
 import com.waldi.rocket.shared.*
 import ktx.math.random
+import mu.two.KotlinLogging
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors
@@ -32,6 +33,8 @@ class GameWorld {
     private lateinit var mapHash: String;
 
     private lateinit var gameController: GameController;
+
+    private val logger = KotlinLogging.logger{}
 
     init {
         camera.position.set(0.0f, 130.0f, 0.0f);
@@ -91,9 +94,11 @@ class GameWorld {
 
     fun getMap(): MapData {
         if(this.platforms.isEmpty() || moon == null) {
+            logger.info("Create new map")
             return initNewMap();
         }
 
+        logger.info("Get existing map data")
         val platformsData = platforms.stream()
             .map { PlatformData(it.x, it.y, it.height, it.width) }
             .toList();

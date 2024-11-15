@@ -33,7 +33,7 @@ class Main : KtxGame<KtxScreen>() {
         addScreen(FirstScreen(gameController.gameWorld))
         setScreen<FirstScreen>()
 
-        GLOBAL_EXECUTOR.execute { bootstrapServer(gameController.gameState) };
+        GLOBAL_EXECUTOR.execute { bootstrapServer(gameController.gameServerState) };
     }
 }
 

@@ -4,12 +4,14 @@ import com.waldi.rocket.shared.GameController
 import com.waldi.rocket.shared.MapData
 import com.waldi.rocket.shared.RocketPositionData
 import io.netty.channel.Channel
+import mu.two.KotlinLogging
 import java.util.concurrent.ConcurrentHashMap
 
-class InMemoryGameState: GameState {
+class InMemoryGameServerState: GameServerState {
     private var sessionIdToPlayer = ConcurrentHashMap<String, Player>();
 
     private lateinit var gameController: GameController;
+    private val logger = KotlinLogging.logger{};
 
     override fun setController(gameController: GameController) {
         this.gameController = gameController;
@@ -38,18 +40,11 @@ class InMemoryGameState: GameState {
     }
 
     override fun addOrUpdatePlayer(oldSessionId: String, newSessionId: String, name: String, channel: Channel): Player {
-        if(oldSessionId.isBlank() || !sessionIdToPlayer.containsKey(newSessionId)) {
+        logger.info { "Players list before add new: ${sessionIdToPlayer.keys}" }
+        if(oldSessionId.isBlank() || !sessionIdToPlayer.containsKey(oldSessionId)) {
             return createNewPlayer(name, newSessionId, channel)
         }
         return refreshSessionForPlayer(oldSessionId, name, channel, newSessionId)
-    }
-
-    override fun removePlayer(sessionId: String) {
-        val playerToRemove = sessionIdToPlayer[sessionId] ?: return;
-
-        gameController.removeRocket(playerToRemove.gameId);
-
-        sessionIdToPlayer.remove(sessionId);
     }
 
     private fun createNewPlayer(name: String, newSessionId: String, channel: Channel): Player {
@@ -65,10 +60,21 @@ class InMemoryGameState: GameState {
         val player = sessionIdToPlayer[oldSessionId]!!
         player.playerName = name;
         player.playerChannel = channel;
+        player.playerSessionId = newSessionId;
         sessionIdToPlayer[newSessionId] = player;
         sessionIdToPlayer.remove(oldSessionId);
 
         return player;
+    }
+
+    override fun removePlayer(sessionId: String) {
+        val playerToRemove = sessionIdToPlayer[sessionId] ?: return;
+
+        logger.info { "Players list before remove: ${sessionIdToPlayer.keys}" }
+
+        gameController.removeRocket(playerToRemove.gameId);
+
+        sessionIdToPlayer.remove(sessionId);
     }
 
     fun updateRocketsPositions(rocketData: List<RocketPositionData>) {

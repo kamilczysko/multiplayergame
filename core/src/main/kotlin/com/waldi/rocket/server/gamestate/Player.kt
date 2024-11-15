@@ -36,6 +36,7 @@ class Player(private var name: String, private var sessionId: String, private va
         this.fuel = fuelLevel;
     }
 
-    val id: String get() = this.gameId;
-
+    override fun toString(): String {
+        return "Player(name='$name', sessionId='$sessionId', gameId='$gameId')"
+    }
 }
