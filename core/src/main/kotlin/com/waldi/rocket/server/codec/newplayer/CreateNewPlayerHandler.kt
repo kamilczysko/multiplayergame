@@ -18,16 +18,15 @@ class CreateNewPlayerHandler(private val gameState: GameState) : SimpleChannelIn
         val channel = ctx?.channel() ?: return;
         val newSessionId = channel.id()?.asShortText() ?: return
 
-        val newPlayer = msg as CreateNewPlayer;
+        val newPlayer: CreateNewPlayer = msg
         val oldSession = newPlayer.sessionId;
 
-        if (oldSession.isBlank() || !gameState.hasSession(oldSession)) {
-            val freshPlayer = gameState.addNewPlayer(newPlayer.name, newSessionId, channel);
-            ctx.writeAndFlush(CreateNewPlayer(freshPlayer.playerName, freshPlayer.gameId, freshPlayer.playerSessionId));
-        } else {
-            val gameId = gameState.getPlayerGameId(oldSession) ?: return;
-            gameState.updatePlayerSession(oldSession, newSessionId, newPlayer.name, channel);
-            ctx.writeAndFlush(CreateNewPlayer(newPlayer.name, gameId, newSessionId));
-        }
+        val freshPlayer = gameState.addOrUpdatePlayer(oldSession, newSessionId, newPlayer.name, channel);
+
+        ctx.writeAndFlush(CreateNewPlayer(freshPlayer.playerName, freshPlayer.gameId, freshPlayer.playerSessionId));
+
+        val mapData = gameState.getMapData();
+        ctx.writeAndFlush(mapData);
     }
+
 }

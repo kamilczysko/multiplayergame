@@ -25,12 +25,4 @@ class Platform(val x: Float, val y: Float, val width: Float, val height: Float):
     override fun deleteFromWorld(world: World) {
         world.destroyBody(floorBody);
     }
-
-    override fun getPosition(): Pair<Float, Float> {
-        return Pair(floorBody.position.x, floorBody.position.y);
-    }
-
-    fun getDimension(): Pair<Float, Float> {
-        return Pair(width, height);
-    }
 }

@@ -13,7 +13,6 @@ class LeavePlayerHandler(val gameState: GameState): SimpleChannelInboundHandler<
         if(msg !is LeavePlayer) {
             return;
         }
-        val leavePlayer = msg as LeavePlayer;
         if(ctx?.channel() != null) {
                 gameState.removePlayer(ctx.channel().id().asShortText());
             }

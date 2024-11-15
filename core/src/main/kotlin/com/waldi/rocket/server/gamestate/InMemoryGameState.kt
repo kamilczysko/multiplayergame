@@ -1,113 +1,78 @@
 package com.waldi.rocket.server.gamestate
 
-import com.waldi.rocket.server.codec.mapdata.MapDataDispatcher
-import com.waldi.rocket.server.gamestate.events.GameStateEventType
-import com.waldi.rocket.server.gamestate.events.GameStateListener
-import com.waldi.rocket.server.gamestate.events.GameStateManager
-import com.waldi.rocket.shared.gamebus.GameEventBus
-import com.waldi.rocket.shared.gamebus.MapData
+import com.waldi.rocket.shared.GameController
+import com.waldi.rocket.shared.MapData
+import com.waldi.rocket.shared.RocketPositionData
 import io.netty.channel.Channel
 import java.util.concurrent.ConcurrentHashMap
 
-class InMemoryGameState private constructor() : GameState {
+class InMemoryGameState: GameState {
+    private var sessionIdToPlayer = ConcurrentHashMap<String, Player>();
 
-    private val sessionIdToPlayer: ConcurrentHashMap<String, Player> = ConcurrentHashMap();
-    private val sessionManager: GameStateManager = GameStateManager();
-    private val mapDataDispatcher = MapDataDispatcher();
+    private lateinit var gameController: GameController;
 
-    private lateinit var gameEventBus: GameEventBus;
+    override fun setController(gameController: GameController) {
+        this.gameController = gameController;
+    }
 
-    companion object {
-        private val instance: InMemoryGameState = InMemoryGameState();
-        fun getInstance(): InMemoryGameState {
-            return instance;
-        }
+    override fun getMapData(): MapData {
+        return gameController.getMap();
+    }
+
+    override fun getAllPlayers(): List<Player> {
+        return sessionIdToPlayer.values.stream().toList();
+    }
+
+    override fun hasSession(sessionId: String): Boolean {
+        return sessionIdToPlayer.contains(sessionId);
     }
 
     override fun getPlayerBySessionId(sessionId: String): Player? {
         return sessionIdToPlayer[sessionId];
     }
 
-    override fun addListener(listener: GameStateListener, eventType: GameStateEventType) {
-        sessionManager.subscribe(listener, eventType);
+    override fun getPlayerByGameId(gameId: String): Player? {
+        return sessionIdToPlayer.values.stream()
+            .filter { it.gameId == gameId }
+            .findAny().orElseGet { null };
+    }
+
+    override fun addOrUpdatePlayer(oldSessionId: String, newSessionId: String, name: String, channel: Channel): Player {
+        if(oldSessionId.isBlank() || !sessionIdToPlayer.containsKey(newSessionId)) {
+            return createNewPlayer(name, newSessionId, channel)
+        }
+        return refreshSessionForPlayer(oldSessionId, name, channel, newSessionId)
     }
 
     override fun removePlayer(sessionId: String) {
-        val playerToRemote = sessionIdToPlayer[sessionId] ?: return;
+        val playerToRemove = sessionIdToPlayer[sessionId] ?: return;
+
+        gameController.removeRocket(playerToRemove.gameId);
+
         sessionIdToPlayer.remove(sessionId);
-        sessionManager.notify(GameStateEventType.PLAYER_LEAVE, sessionIdToPlayer.values, listOf(playerToRemote))
     }
 
-    override fun addGameEventBus(bus: GameEventBus) {
-        gameEventBus = bus;
-    }
-
-    override fun updatePlayerSession(
-        prevSessionId: String,
-        actualSessionId: String,
-        newName: String,
-        actualChannel: Channel
-    ) {
-        val player = sessionIdToPlayer[prevSessionId] ?: return;
-        player.playerSessionId = actualSessionId;
-        player.playerName = newName;
-        player.playerChannel = actualChannel;
-
-        sessionIdToPlayer.remove(prevSessionId);
-        sessionIdToPlayer[actualSessionId] = player;
-        sessionManager.notify(GameStateEventType.PLAYER_LIST_UPDATE, listOf(player), sessionIdToPlayer.values);
-    }
-
-    override fun getPlayerGameId(sessionId: String): String? {
-        return sessionIdToPlayer[sessionId]?.gameId
-    }
-
-    override fun addNewPlayer(name: String, newSessionId: String, channel: Channel): Player {
+    private fun createNewPlayer(name: String, newSessionId: String, channel: Channel): Player {
         val newPlayer = Player(name, newSessionId, channel);
-        sessionManager.notify(GameStateEventType.PLAYER_LIST_UPDATE, sessionIdToPlayer.values, listOf(newPlayer));
         sessionIdToPlayer[newSessionId] = newPlayer;
-        sessionManager.notify(GameStateEventType.PLAYER_LIST_UPDATE, listOf(newPlayer), sessionIdToPlayer.values);
 
-        gameEventBus.addRocket(newPlayer.id, name);
-        newPlayer.playerChannel.writeAndFlush(getMapData());
+        gameController.initRocket(newPlayer.playerName, newPlayer.gameId); //name is unnecessary, todo remove later
 
         return newPlayer;
     }
 
-    override fun hasSession(sessionId: String): Boolean = sessionIdToPlayer.containsKey(sessionId);
+    private fun refreshSessionForPlayer(oldSessionId: String, name: String, channel: Channel, newSessionId: String): Player {
+        val player = sessionIdToPlayer[oldSessionId]!!
+        player.playerName = name;
+        player.playerChannel = channel;
+        sessionIdToPlayer[newSessionId] = player;
+        sessionIdToPlayer.remove(oldSessionId);
 
-    override fun getAllPlayers(): List<Player> {
-        return sessionIdToPlayer.values.toList();
+        return player;
     }
 
-    override fun rocketScoredPoint(rocketId: String, points: Int) {
-        addPoint(rocketId);
-    }
-
-    override fun addPoint(playerId: String) {
-        sessionIdToPlayer.values.stream()
-            .filter { player -> player.gameId == playerId }
-            .findFirst().ifPresent { it.addPoint(); } //send data on channel
-    }
-
-    override fun initMap() {
-        gameEventBus.initNewMap();
-        val mapData = getMapData();
-        getAllPlayers().stream().forEach { player ->
-            player.playerChannel.writeAndFlush(mapData)
-        }
-    }
-
-    override fun getMapData(): MapData  {
-        return gameEventBus.getMapData();
-    }
-
-    override fun resetMap() {
-        gameEventBus.resetMap();
-        val mapData = getMapData();
-        getAllPlayers().stream().forEach { player ->
-            player.playerChannel.writeAndFlush(mapData)
-        }
+    fun updateRocketsPositions(rocketData: List<RocketPositionData>) {
+        TODO("Not yet implemented")
     }
 
 }

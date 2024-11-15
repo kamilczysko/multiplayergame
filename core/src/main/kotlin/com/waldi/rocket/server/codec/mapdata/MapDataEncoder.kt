@@ -1,21 +1,17 @@
 package com.waldi.rocket.server.codec.mapdata
 
-import com.waldi.rocket.server.gamestate.Player
-import com.waldi.rocket.shared.gamebus.MapData
+import com.waldi.rocket.shared.MapData
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import io.netty.channel.ChannelHandlerContext
+import io.netty.handler.codec.MessageToMessageEncoder
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame
 
-class MapDataDispatcher {
-    fun sendMapData(playersToNotify: Collection<Player>, mapData: MapData) {
-        val encodedData = encode(mapData).retain();
-        try {
-            playersToNotify.stream()
-                .forEach { player ->
-                    player.playerChannel.writeAndFlush(encodedData);
-                }
-        } finally {
-            encodedData.release();
-        }
+class MapDataEncoder: MessageToMessageEncoder<MapData>() {
+
+    override fun encode(p0: ChannelHandlerContext?, p1: MapData?, p2: MutableList<Any>?) {
+        p1 ?: return;
+        p2?.add(BinaryWebSocketFrame(encode(p1)));
     }
 
     private fun encode(mapData: MapData): ByteBuf {

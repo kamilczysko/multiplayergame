@@ -30,8 +30,4 @@ class Moon(val x: Float,val y: Float, val radius: Float): WorldObject {
     override fun deleteFromWorld(world: World) {
         world.destroyBody(moonBody);
     }
-
-    override fun getPosition(): Pair<Float, Float> {
-        return Pair(x, y);
-    }
 }

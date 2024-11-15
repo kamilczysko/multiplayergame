@@ -8,15 +8,16 @@ private const val BOX_SIZE = .7f
 
 public const val BASE_PLATFORM_WIDTH: Float = 20.0f
 
-fun generate(): Triple<List<Platform>, List<Platform>, Moon> {
-    val basePlatforms: List<Platform> = listOf(
+fun generate(): Pair<MutableList<Platform>, Moon> {
+    val platforms: MutableList<Platform> = mutableListOf(
         Platform(0.0f, 0.0f, BASE_PLATFORM_WIDTH, 1.0f),
         Platform(BASE_PLATFORM_WIDTH, 70.0f, 1.0f, 70.0f),
         Platform(-BASE_PLATFORM_WIDTH, 70.0f, 1.0f, 70.0f)
     )
-    val platforms: List<Platform> = generatePlatforms()
+    platforms.addAll(generatePlatforms());
+
     val moon = Moon(0.0f, (210..260).random().toFloat(), (4..13).random().toFloat());
-    return Triple(basePlatforms, platforms, moon);
+    return Pair(platforms, moon);
 }
 
 private fun generatePlatforms(): List<Platform> {

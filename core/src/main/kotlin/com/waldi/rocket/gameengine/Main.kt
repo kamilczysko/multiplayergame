@@ -1,35 +1,39 @@
 package com.waldi.rocket.gameengine
 
 import com.waldi.rocket.gameengine.gameworld.GameWorld
-import com.waldi.rocket.gameengine.enginestate.EngineState
 import com.waldi.rocket.server.bootstrapServer
-import com.waldi.rocket.server.codec.playerlistchange.PlayerLeaveDispatcher
-import com.waldi.rocket.server.codec.playerlistchange.PlayerListChangeDispatcher
-import com.waldi.rocket.server.gamestate.GameState
-import com.waldi.rocket.server.gamestate.InMemoryGameState
-import com.waldi.rocket.server.gamestate.events.GameStateEventType
+import com.waldi.rocket.shared.GameController
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.async.KtxAsync
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
+val GLOBAL_EXECUTOR: ExecutorService = Executors.newSingleThreadExecutor()
 
 class Main : KtxGame<KtxScreen>() {
+
     override fun create() {
-        val engineState = EngineState();
 
-        val gameState: GameState = InMemoryGameState.getInstance();
-        gameState.addGameEventBus(engineState);
-        gameState.addListener(PlayerListChangeDispatcher(), GameStateEventType.PLAYER_LIST_UPDATE);
-        gameState.addListener(PlayerLeaveDispatcher(), GameStateEventType.PLAYER_LEAVE);
+        Runtime.getRuntime().addShutdownHook(Thread{
+            try {
+                GLOBAL_EXECUTOR.shutdown();
+                if (GLOBAL_EXECUTOR.awaitTermination(5, TimeUnit.SECONDS)) {
+                    GLOBAL_EXECUTOR.shutdownNow()
+                }
+            } catch (exception: InterruptedException) {
+                GLOBAL_EXECUTOR.shutdownNow();
+            }
+        })
 
-        val gameWorld = GameWorld(engineState, gameState);
+        val gameController = GameController();
 
         KtxAsync.initiate()
-        addScreen(FirstScreen(gameWorld))
+        addScreen(FirstScreen(gameController.gameWorld))
         setScreen<FirstScreen>()
 
-        bootstrapServer(gameState)
-
-        gameState
+        GLOBAL_EXECUTOR.execute { bootstrapServer(gameController.gameState) };
     }
 }
 
@@ -39,6 +43,5 @@ class FirstScreen(private val gameWorld: GameWorld) : KtxScreen {
     }
 
     override fun dispose() {
-
     }
 }

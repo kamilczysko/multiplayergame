@@ -1,10 +1,6 @@
 package com.waldi.rocket.server
 
-import com.waldi.rocket.server.codec.playerlistchange.PlayerLeaveDispatcher
-import com.waldi.rocket.server.codec.playerlistchange.PlayerListChangeDispatcher
 import com.waldi.rocket.server.gamestate.GameState
-import com.waldi.rocket.server.gamestate.InMemoryGameState
-import com.waldi.rocket.server.gamestate.events.GameStateEventType
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelOption
@@ -13,13 +9,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 
 private const val PORT = 60231;
 
-fun runServerOnly() {
-    val gameState: GameState = InMemoryGameState.getInstance();
-    gameState.addListener(PlayerListChangeDispatcher(), GameStateEventType.PLAYER_LIST_UPDATE);
-    gameState.addListener(PlayerLeaveDispatcher(), GameStateEventType.PLAYER_LEAVE);
-
-    bootstrapServer(gameState)
-}
 
 fun bootstrapServer(gameState: GameState) {
     println("starting server...")
@@ -44,6 +33,3 @@ fun bootstrapServer(gameState: GameState) {
     }
 }
 
-fun main() {
-    runServerOnly()
-}

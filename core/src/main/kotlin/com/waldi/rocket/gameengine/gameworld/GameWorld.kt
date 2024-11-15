@@ -7,58 +7,128 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
-import com.waldi.rocket.gameengine.enginestate.EngineState
-import com.waldi.rocket.gameengine.objects.rocket.RocketListener
+import com.waldi.rocket.gameengine.objects.Moon
+import com.waldi.rocket.gameengine.objects.Platform
+import com.waldi.rocket.gameengine.objects.Rocket
+import com.waldi.rocket.shared.*
+import ktx.math.random
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.stream.Collectors
+import kotlin.collections.ArrayList
 
-class GameWorld(val engineState: EngineState, val rocketListener: RocketListener?) {
-    val gravity = Vector2(0.0f, -10.0f)
-    val world: World = World(gravity, true);
-    val camera: OrthographicCamera = OrthographicCamera(100f, 240f);
-    val debug: Box2DDebugRenderer = Box2DDebugRenderer();
-    val batch: Batch = SpriteBatch();
-    val font: BitmapFont = BitmapFont();
+class GameWorld {
+    private val gravity = Vector2(0.0f, -10.0f)
+    private val world: World = World(gravity, true);
+    private val camera: OrthographicCamera = OrthographicCamera(100f, 240f);
+    private val debug: Box2DDebugRenderer = Box2DDebugRenderer();
+    private val batch: Batch = SpriteBatch();
+    private val font: BitmapFont = BitmapFont();
+
+
+    private val rocketIdToEntity = ConcurrentHashMap<String, Rocket>();
+    private var platforms: List<Platform> = emptyList();
+    private var moon: Moon? = null;
+    private lateinit var mapHash: String;
+
+    private lateinit var gameController: GameController;
 
     init {
         camera.position.set(0.0f, 130.0f, 0.0f);
         camera.zoom += 0.1f;
         camera.update();
         debug.isDrawVelocities = true;
-        world.setContactListener(GameContactListener(rocketListener));
+        world.setContactListener(GameContactListener({ rocketId -> scorePoint(rocketId) }));
 
-        engineState.initNewMap();
-        engineState.addPlatformsToTheWorld(world);
-        engineState.addMoonToTheWorld(world);
+        println("Starting game engine...");
+    }
 
-        engineState.onAddObjectToTheWorld { worldObject -> worldObject.addToWorld(world) }
-        engineState.onDestroyObject { worldObject -> worldObject.addToWorld(world) }
-        engineState.onNewRocket{  rocket -> rocket.addToWorld(world) }
-        engineState.onRemoveRocket{ rocket -> rocket.deleteFromWorld(world)}
+    fun setController(gameController: GameController) {
+        this.gameController = gameController;
     }
 
     fun render() {
 
         batch.begin();
-//        for ((index, rocket) in gameState.getAllPlayers().withIndex()) {
-//            font.draw(batch, "${rocket.name} ${(rocket.fuel * 100).toInt()}%", 10.0f, index * 20.0f + 15.0f);
-//        }
+        font.draw(batch, "TEST", 510.0f, 1 * 20.0f + 15.0f);
+        for ((index, rocket) in rocketIdToEntity.values.withIndex()) {
+            font.draw(batch, "${rocket.name} ${(rocket.fuel * 100).toInt()}%", 10.0f, index * 20.0f + 15.0f);
+
+            if(rocket.isAccelerating) {
+                rocket.accelerate();
+            }
+
+            val rocketsData = rocketIdToEntity.values.stream()
+                .map { RocketPositionData(it.x, it.y, it.angle, it.rocketId, it.fuel, it.points) }
+                .collect(Collectors.toList())
+
+            gameController.notifyAboutGameState(rocketsData);
+
+        }
         batch.end();
 
         world.step(1 / 60f, 6, 2);
         debug.render(world, camera.combined);
     }
 
-//    private fun flyMeToTheMoon(id: Short) {
-//        val rocketToFly = gameState.getPlayer(id);
-//
-//        var mousePosition = Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
-//        camera.unproject(mousePosition)
-//
-//        val rocketBody = rocketToFly.rocketBody
-//        val targetDirection = (vec2(mousePosition.x, mousePosition.y).sub(rocketBody.position).nor());
-//        var currentDir = vec2(cos(rocketBody.angle), sin(rocketBody.angle));
-//        currentDir = (currentDir.add(targetDirection.sub(currentDir)))
-//        val angle = atan2(currentDir.x, currentDir.y)
-//
-//        rocketToFly.rotate(angle);
-//    }
+    private fun scorePoint(rocketId: String) {
+        rocketIdToEntity[rocketId]?.addPoint() ?: return;
+    }
+
+    fun initRocket(rocketName: String, rocketId: String) {
+        val newRocket = Rocket(rocketId, rocketName, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 1.4f);
+
+        assert(!rocketIdToEntity.contains(rocketId)) { "rocket $rocketId already exists in game" }
+
+        rocketIdToEntity[rocketId] = newRocket;
+        newRocket.addToWorld(world);
+    }
+
+    fun removeRocket(rocketId: String) {
+        rocketIdToEntity[rocketId]?.deleteFromWorld(world);
+        rocketIdToEntity.remove(rocketId);
+    }
+
+    fun getMap(): MapData {
+        if(this.platforms.isEmpty() || moon == null) {
+            return initNewMap();
+        }
+
+        val platformsData = platforms.stream()
+            .map { PlatformData(it.x, it.y, it.height, it.width) }
+            .toList();
+
+        val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y);
+
+        return MapData(platformsData, moonData, mapHash);
+    }
+
+    private fun initNewMap(): MapData {
+        moon?.deleteFromWorld(world);
+
+        platforms.stream().forEach { it.deleteFromWorld(world) };
+
+        val newMap = generate();
+        platforms = ArrayList(newMap.first);
+        moon = newMap.second;
+
+        moon?.addToWorld(world)
+        platforms.stream().forEach { it.addToWorld(world) }
+
+        mapHash = UUID.randomUUID().mostSignificantBits.toString().replace("-", "").take(5);
+
+        return getMap();
+    }
+
+    fun startAccelerating(rocketId: String) {
+        rocketIdToEntity[rocketId]?.isAccelerating = true;
+    }
+
+    fun stopAccelerating(rocketId: String) {
+        rocketIdToEntity[rocketId]?.isAccelerating = false;
+    }
+
+    fun rotate(rocketId: String, angle: Float) {
+        rocketIdToEntity[rocketId]?.rotate(angle);
+    }
 }
