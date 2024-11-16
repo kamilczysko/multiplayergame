@@ -2,6 +2,7 @@ package com.waldi.rocket.server.gamestate
 
 import com.waldi.rocket.shared.GameController
 import com.waldi.rocket.shared.MapData
+import com.waldi.rocket.shared.RocketData
 import io.netty.channel.Channel
 
 interface GameServerState {
@@ -13,4 +14,5 @@ interface GameServerState {
     fun removePlayer(sessionId: String);
     fun setController(gameController: GameController);
     fun getMapData(): MapData?;
+    fun updateRocketsPositions(rocketData: List<RocketData>, timestamp: Int)
 }

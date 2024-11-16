@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.handler.logging.LoggingHandler
 import mu.two.KotlinLogging
 
 private const val PORT = 60231;
@@ -13,6 +14,7 @@ private const val PORT = 60231;
 private val logger = KotlinLogging.logger {  }
 
 fun bootstrapServer(gameServerState: GameServerState) {
+
     logger.info { "Starting server..." }
     val bossGroup = NioEventLoopGroup(1);
     val workGroup = NioEventLoopGroup();

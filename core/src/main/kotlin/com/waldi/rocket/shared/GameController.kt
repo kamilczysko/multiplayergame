@@ -36,10 +36,8 @@ class GameController() {
         gameWorld.rotate(rocketId, angle);
     }
 
-    fun notifyAboutGameState(rocketData: List<RocketPositionData>) {
-        gameServerState.getAllPlayers().stream().forEach {
-            it.playerChannel.writeAndFlush("sdfsdfsf") //todo implement, maybe method to encode also and send
-        }
+    fun notifyAboutGameState(rocketData: List<RocketData>, timestamp: Int) {
+       gameServerState.updateRocketsPositions(rocketData, timestamp);
     }
 
 }

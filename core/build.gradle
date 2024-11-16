@@ -37,8 +37,9 @@ dependencies {
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
   implementation 'io.netty:netty-all:5.0.0.Alpha2'
+
   implementation("io.github.microutils:kotlin-logging:4.0.0-beta-2")
-  implementation("ch.qos.logback:logback-core:1.5.12")
+  implementation("ch.qos.logback:logback-classic:1.5.12")
   implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
 
   if(enableGraalNative == 'true') {

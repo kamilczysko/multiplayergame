@@ -10,7 +10,7 @@ public const val BASE_PLATFORM_WIDTH: Float = 20.0f
 
 fun generate(): Pair<MutableList<Platform>, Moon> {
     val platforms: MutableList<Platform> = mutableListOf(
-        Platform(0.0f, 0.0f, BASE_PLATFORM_WIDTH, 1.0f),
+        Platform(0.0f, 1.0f, BASE_PLATFORM_WIDTH, 1.0f),
         Platform(BASE_PLATFORM_WIDTH, 70.0f, 1.0f, 70.0f),
         Platform(-BASE_PLATFORM_WIDTH, 70.0f, 1.0f, 70.0f)
     )
@@ -34,7 +34,7 @@ private fun generatePlatforms(): List<Platform> {
 private fun createLayerSingle(y: Float = 8.0f): Platform {
     val width = (4..10).random().toFloat();
     val x = ((0..(BASE_PLATFORM_WIDTH * 2).toInt()).random()).toFloat() - BASE_PLATFORM_WIDTH;
-    return Platform(x, y + (0..2).random(), width, .5f)
+    return Platform(x, y + (0..2).random(), width, 1f)
 }
 
 //private fun wallOfBoxes(x: Float, y: Float) {

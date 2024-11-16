@@ -1,7 +1,11 @@
+import { addMoon, addBlock } from "./gameview.js"
+
 let socket = null;
 const INIT_NEW_PLAYER = 0x01;
 
-const players = new Map()
+export let rockets = new Map();
+let timestamp = -1;
+
 let hasActiveSession = getSessionFromCookie() !== "";
 
 document.getElementById("nameInput").value = getNameFromCookie() || "";
@@ -18,6 +22,8 @@ function joinGame() {
     }
     makeConnection();
 }
+
+document.getElementById("joinButton").onclick = (event) => joinGame()
 
 onfocus = () => {
     if (socket !== null && socket.readyState === WebSocket.CLOSED) {
@@ -48,10 +54,11 @@ function makeConnection() {
         socket.send(buffer)
     }
 
+
     socket.onmessage = (event) => {
         const dataView = new DataView(new Uint8Array(event.data).buffer);
         const messageType = dataView.getUint8(0);
-        console.log("got message: " + messageType)
+        // console.log("got message: " + messageType)
         switch (messageType) {
             case 0x01:
                 console.log("New user response")
@@ -69,26 +76,64 @@ function makeConnection() {
                 console.log("Map info message")
                 decodeMapInfo(event.data);
                 break;
+            case 0x05:
+                // console.log("Gameplay")
+                decodeRockets(event.data);
+                break;
         }
     }
 
     hasActiveSession = true;
 }
 
+function decodeRockets(bytes) {
+    const buffer = new Uint8Array(bytes).buffer;
+    const dataView = new DataView(buffer);
+    let mark = 0;
+    const serverTimestamp = dataView.getUint32(++mark)
+    debugger;
+    if(serverTimestamp < timestamp) {
+        return;
+    }
+    timestamp = serverTimestamp;
+    mark += 4;
+    while (mark < dataView.byteLength) {
+        debugger;
+        const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
+        // const playerId = String.fromCharCode.apply(null, new Uint8Array(buffer, mark, 5));
+        mark += 5;
+        const x = dataView.getInt16(mark);
+        mark += 2;
+        const y = dataView.getInt16(mark);
+        mark += 2;
+        const angle = dataView.getInt8(mark);
+        mark ++;
+        const fuel = dataView.getUint8(mark);
+        mark ++;
+        const points = dataView.getUint8(mark);
+        mark++;
+        rockets[playerId] = {
+            x: x, y: y, angle: (angle / 100) * Math.PI, fuel: fuel, points: points
+        }
+    }
+}
+
 function decodeMapInfo(bytes) {
     const buffer = new Uint8Array(bytes).buffer;
     const dataView = new DataView(buffer);
 
-    const moon = {x: dataView.getUint8(1), y: dataView.getUint8(2), radius: dataView.getUint8(3)};
+    const moon = {x: dataView.getInt8(1), y: dataView.getUint8(2), radius: dataView.getUint8(3)};
+    addMoon(moon.x, moon.y, moon.radius);
+
     const blocks = [];
     
     let mark = 4;
     while (mark < dataView.byteLength) {
-        blocks.push({x: dataView.getUint8(mark), y: dataView.getUint8(++mark), width: dataView.getUint8(++mark), height: dataView.getUint8(++mark)})
+        const block = {x: dataView.getInt8(mark), y: dataView.getUint8(++mark), width: dataView.getUint8(++mark), height: dataView.getUint8(++mark)};
+        blocks.push(block);
+        addBlock(block.x, block.y, block.width, block.height);
         mark++;
     }
-
-    
 }
 
 function decodePlayerLeave(bytes) {
@@ -215,7 +260,10 @@ function leaveGame() {
     setCookie("sessionId", "")
     setCookie("playerId", "")
 
-    document.getElementById("scoreBoardList").innerHTML = ""
+    // document.getElementById("scoreBoardList").innerHTML = ""
 
     hasActiveSession = false;
+    rockets = new Map();
 }
+
+document.getElementById("leaveButton").onclick = (event) => leaveGame()

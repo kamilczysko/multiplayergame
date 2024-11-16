@@ -1,9 +1,12 @@
 package com.waldi.rocket.server.gamestate
 
+import com.waldi.rocket.server.codec.gameplay.encode
 import com.waldi.rocket.shared.GameController
 import com.waldi.rocket.shared.MapData
-import com.waldi.rocket.shared.RocketPositionData
+import com.waldi.rocket.shared.RocketData
 import io.netty.channel.Channel
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame
+import io.netty.util.ReferenceCountUtil
 import mu.two.KotlinLogging
 import java.util.concurrent.ConcurrentHashMap
 
@@ -77,8 +80,14 @@ class InMemoryGameServerState: GameServerState {
         sessionIdToPlayer.remove(sessionId);
     }
 
-    fun updateRocketsPositions(rocketData: List<RocketPositionData>) {
-        TODO("Not yet implemented")
+    override fun updateRocketsPositions(rocketData: List<RocketData>, timestamp: Int) {
+        val data = encode(rocketData, timestamp);
+        try {
+            sessionIdToPlayer.values.
+            forEach{player: Player ->  player.playerChannel.writeAndFlush(BinaryWebSocketFrame(data.retain().duplicate())) }
+        } finally {
+            data.release();
+        }
     }
 
 }
