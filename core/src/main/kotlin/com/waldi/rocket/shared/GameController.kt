@@ -25,17 +25,6 @@ class GameController() {
         return gameWorld.getMap();
     }
 
-    fun startAccelerating(rocketId: String) {
-        gameWorld.startAccelerating(rocketId);
-    }
-    fun stopAccelerating(rocketId: String) {
-        gameWorld.stopAccelerating(rocketId);
-
-    }
-    fun rotate(rocketId: String, angle: Float) {
-        gameWorld.rotate(rocketId, angle);
-    }
-
     fun notifyAboutGameState(rocketData: List<RocketData>, timestamp: Int) {
        gameServerState.updateRocketsPositions(rocketData, timestamp);
     }

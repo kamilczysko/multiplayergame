@@ -1,11 +1,16 @@
 package com.waldi.rocket.server
 
+import com.waldi.rocket.gameengine.gameworld.GameWorld
 import com.waldi.rocket.server.codec.GameDecoder
 import com.waldi.rocket.server.codec.leaveplayer.LeavePlayerHandler
 import com.waldi.rocket.server.codec.mapdata.MapDataEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerHandler
+import com.waldi.rocket.server.codec.steering.SteerDecoder
+import com.waldi.rocket.server.codec.steering.SteeringHandler
+import com.waldi.rocket.server.codec.steering.SteeringMessage
 import com.waldi.rocket.server.gamestate.GameServerState
+import com.waldi.rocket.shared.GameController
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.http.HttpHeaderNames.WEBSOCKET_PROTOCOL
@@ -15,7 +20,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler
 import io.netty.handler.stream.ChunkedWriteHandler
 import java.net.InetAddress
 
-class SocketChannelInitializer(private val gameServerState: GameServerState) : ChannelInitializer<SocketChannel>() {
+class SocketChannelInitializer(private val gameServerState: GameServerState, private val gameWorld: GameWorld) : ChannelInitializer<SocketChannel>() {
 
     override fun initChannel(channel: SocketChannel) {
         val host = InetAddress.getLocalHost();
@@ -28,6 +33,7 @@ class SocketChannelInitializer(private val gameServerState: GameServerState) : C
         pipeline.addLast(GameDecoder())
         pipeline.addLast(CreateNewPlayerEncoder())
         pipeline.addLast(MapDataEncoder())
+        pipeline.addLast(SteeringHandler(gameWorld, gameServerState))
         pipeline.addLast(CreateNewPlayerHandler(gameServerState))
         pipeline.addLast(LeavePlayerHandler(gameServerState))
     }

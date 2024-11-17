@@ -1,6 +1,8 @@
-import { rockets } from "./connector.js";
+import { rockets, sendSteeringAction } from "./connector.js";
 
-const app = new PIXI.Application();
+const app = new PIXI.Application({
+    interactionFrequency: 2000
+});
 await app.init({ antialias: true, resizeTo: window })
 document.getElementById("gameplay").appendChild(app.canvas)
 
@@ -21,9 +23,53 @@ container.scale.x *= -1;
 app.stage.addChild(container);
 
 let elapsed = 0.0;
+
+function getAngle(rocket, mouseX, mouseY) {
+    const deltaX = mouseX - rocket.x;
+    const deltaY = mouseY - rocket.y;
+    const angle = Math.atan2(deltaY, deltaX);
+    return angle;
+}
+
+
+
+app.stage.interactive = true;
+app.stage.eventMode = 'static';
+app.stage.hitArea = app.screen;
+
+let accelerate = false;
+let angle = 0;
+let interval = null;
+
+app.stage.on('pointerdown', (event) => {
+    accelerate = true;
+    interval = setInterval(() => sendSteeringAction(angle, accelerate), 100)
+});
+app.stage.on('pointerup', (event) => {
+    accelerate = false;
+    clearInterval(interval)
+    sendSteeringAction(angle, false)
+});
+app.stage.on('pointerupoutside', (event) => {
+    accelerate = false;
+    clearInterval(interval)
+    sendSteeringAction(angle, false)
+});
+
+app.stage.on('pointermove', (event) => {
+    if(accelerate === false) { 
+        return
+    }
+    const rocket = rocketSprites[getPlayerId()];
+    if(rocket == null) {
+        return;
+    }
+    const mousePosition = rocket.toLocal(event.data.global);
+    angle = parseInt(getAngle(rocket, mousePosition.x, mousePosition.y) / Math.PI * 100);
+});
+
 app.ticker.add((ticker) => {
     elapsed += ticker.deltaTime;
-    console.log(elapsed)
     const myRocket = rocketSprites[getPlayerId()];
     if (myRocket) {
         scale = lerp(scale, -40, 0.1);

@@ -23,7 +23,6 @@ class CreateNewPlayerHandler(private val gameServerState: GameServerState) : Sim
 
         val newPlayer: CreateNewPlayer = msg
         val oldSession = newPlayer.sessionId;
-
         val freshPlayer = gameServerState.addOrUpdatePlayer(oldSession, newSessionId, newPlayer.name, channel);
 
         logger.info { "Create new player or refresh session for $freshPlayer" }

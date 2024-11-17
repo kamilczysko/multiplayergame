@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.*
 
 const val ROCKET_WIDTH = 0.5f;
 const val ROCKET_HEIGHT = 1.5f;
-const val THRUST_FORCE = 6.5f;
+const val THRUST_FORCE = 20f;
 
 private const val FUEL_CONSUMPTION = 0.0009f
 
@@ -52,8 +52,8 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
 
         rocketFixtureDef = FixtureDef();
         rocketFixtureDef.shape = boxShape;
-        rocketFixtureDef.restitution = 0f;
-        rocketFixtureDef.density = 1f;
+        rocketFixtureDef.restitution = .2f;
+        rocketFixtureDef.density = .4f;
         rocketFixtureDef.friction = .95f;
 
         rocketBody.angularDamping = .7f;

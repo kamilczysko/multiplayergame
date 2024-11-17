@@ -77,7 +77,7 @@ function makeConnection() {
                 decodeMapInfo(event.data);
                 break;
             case 0x05:
-                // console.log("Gameplay")
+                console.log("Gameplay")
                 decodeRockets(event.data);
                 break;
         }
@@ -266,3 +266,13 @@ function leaveGame() {
 }
 
 document.getElementById("leaveButton").onclick = (event) => leaveGame()
+
+
+export function sendSteeringAction(angle, accelerate) {
+    const buffer = new Int8Array(3);
+
+    buffer[0] = 0x06;
+    buffer[1] = angle;
+    buffer[2] = accelerate;
+    socket.send(buffer)
+}
