@@ -36,7 +36,7 @@ class GameWorld {
 
     private var gameTimeStamp: Int = 0;
 
-    private val logger = KotlinLogging.logger{}
+    private val logger = KotlinLogging.logger {}
 
     init {
         camera.position.set(0.0f, 130.0f, 0.0f);
@@ -59,12 +59,12 @@ class GameWorld {
         for ((index, rocket) in rocketIdToEntity.values.withIndex()) {
             font.draw(batch, "${rocket.name} ${(rocket.fuel * 100).toInt()}%", 10.0f, index * 20.0f + 15.0f);
 
-            if(rocket.isAccelerating) {
+            if (rocket.isAccelerating) {
                 rocket.accelerate();
             }
 
             val rocketsData = rocketIdToEntity.values.stream()
-                .map { RocketData(it.x-0.5f, it.y-1.5f, it.angle, it.rocketId, it.fuel, it.points) }
+                .map { RocketData(it.x, it.y + 0.5f, it.angle, it.rocketId, it.fuel, it.points) }
                 .collect(Collectors.toList())
 
             gameTimeStamp++;
@@ -82,7 +82,8 @@ class GameWorld {
     }
 
     fun initRocket(rocketName: String, rocketId: String) {
-        val newRocket = Rocket(rocketId, rocketName, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 20.1f);
+        val newRocket =
+            Rocket(rocketId, rocketName, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 5f);
 
         assert(!rocketIdToEntity.contains(rocketId)) { "rocket $rocketId already exists in game" }
 
@@ -96,7 +97,7 @@ class GameWorld {
     }
 
     fun getMap(): MapData {
-        if(this.platforms.isEmpty() || moon == null) {
+        if (this.platforms.isEmpty() || moon == null) {
             logger.info("Create new map")
             gameTimeStamp = 0;
             return initNewMap();
@@ -104,7 +105,7 @@ class GameWorld {
 
         logger.info("Get existing map data")
         val platformsData = platforms.stream()
-            .map { PlatformData(it.x-it.width, it.y-it.height, it.width*2, it.height*2) }
+            .map { PlatformData(it.x - it.width, it.y - it.height, it.width * 2, it.height * 2) }
             .toList();
 
         val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y);

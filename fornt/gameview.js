@@ -72,18 +72,21 @@ app.ticker.add((ticker) => {
     elapsed += ticker.deltaTime;
     const myRocket = rocketSprites[getPlayerId()];
     if (myRocket) {
-        scale = lerp(scale, -40, 0.1);
+        scale = lerp(scale, -10, 0.1);
         container.scale.set(scale);
         container.scale.x *= -1;
         container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
         container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
+        // container.pivot.x = app.renderer.width / 2
+        // container.pivot.y = app.renderer.height / 1.2
     }
 
     Object.values(rockets).forEach(rocket => {
         const r = rocketSprites[rocket.playerId];
         r.x = lerp(r.x, rocket.x, 0.07);
         r.y = lerp(r.y, rocket.y, 0.07);
-        r.rotate = lerp(r.rotate, rocket.angle)
+        r.rotation = lerp(r.rotation, rocket.angle, 0.05)
+        // container.rotation = r.rotation
         // //add rotation
     })
 })
@@ -101,7 +104,7 @@ function getPlayerId() {
 
 export function addBlock(x, y, width, heigth) {
     const block = graphics
-        .rect(x, y, width, heigth)
+        .rect(x,y , width, heigth)
         .fill("white");
         container.addChild(block);
 }
@@ -115,6 +118,8 @@ export function addRocket(x, y, angle, playerId) {
         .fill("green");
     container.addChild(block);
     rocketSprites[playerId] = block;
+    block.pivot.x = 0.5;
+    block.pivot.y = 1.5;
     block.x = x;
     block.y = y;
     block.rotate = 0;
