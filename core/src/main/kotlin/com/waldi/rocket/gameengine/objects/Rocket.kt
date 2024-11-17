@@ -3,9 +3,9 @@ package com.waldi.rocket.gameengine.objects
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
-const val ROCKET_WIDTH = 0.15f
-const val ROCKET_HEIGHT = 0.6f
-const val THRUST_FORCE = 6.5f
+const val ROCKET_WIDTH = 0.5f;
+const val ROCKET_HEIGHT = 1.5f;
+const val THRUST_FORCE = 6.5f;
 
 private const val FUEL_CONSUMPTION = 0.0009f
 
@@ -52,7 +52,7 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
 
         rocketFixtureDef = FixtureDef();
         rocketFixtureDef.shape = boxShape;
-        rocketFixtureDef.restitution = .3f;
+        rocketFixtureDef.restitution = 0f;
         rocketFixtureDef.density = 1f;
         rocketFixtureDef.friction = .95f;
 

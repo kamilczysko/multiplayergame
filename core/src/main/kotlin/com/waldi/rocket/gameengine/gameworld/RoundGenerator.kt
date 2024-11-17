@@ -16,7 +16,7 @@ fun generate(): Pair<MutableList<Platform>, Moon> {
     )
     platforms.addAll(generatePlatforms());
 
-    val moon = Moon(0.0f, (210..260).random().toFloat(), (4..13).random().toFloat());
+    val moon = Moon(0.0f, (210..240).random().toFloat(), (4..13).random().toFloat());
     return Pair(platforms, moon);
 }
 

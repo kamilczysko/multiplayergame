@@ -1,9 +1,9 @@
-import { addMoon, addBlock } from "./gameview.js"
+import { addMoon, addBlock, addRocket } from "./gameview.js"
 
 let socket = null;
 const INIT_NEW_PLAYER = 0x01;
 
-export let rockets = new Map();
+export let rockets = {}
 let timestamp = -1;
 
 let hasActiveSession = getSessionFromCookie() !== "";
@@ -91,14 +91,12 @@ function decodeRockets(bytes) {
     const dataView = new DataView(buffer);
     let mark = 0;
     const serverTimestamp = dataView.getUint32(++mark)
-    debugger;
-    if(serverTimestamp < timestamp) {
+    if (serverTimestamp < timestamp) {
         return;
     }
     timestamp = serverTimestamp;
     mark += 4;
     while (mark < dataView.byteLength) {
-        debugger;
         const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
         // const playerId = String.fromCharCode.apply(null, new Uint8Array(buffer, mark, 5));
         mark += 5;
@@ -107,14 +105,15 @@ function decodeRockets(bytes) {
         const y = dataView.getInt16(mark);
         mark += 2;
         const angle = dataView.getInt8(mark);
-        mark ++;
+        mark++;
         const fuel = dataView.getUint8(mark);
-        mark ++;
+        mark++;
         const points = dataView.getUint8(mark);
         mark++;
-        rockets[playerId] = {
-            x: x, y: y, angle: (angle / 100) * Math.PI, fuel: fuel, points: points
+        rockets[playerId.toString()] = {
+            "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId
         }
+        addRocket(x, y, angle, playerId);
     }
 }
 
@@ -122,14 +121,14 @@ function decodeMapInfo(bytes) {
     const buffer = new Uint8Array(bytes).buffer;
     const dataView = new DataView(buffer);
 
-    const moon = {x: dataView.getInt8(1), y: dataView.getUint8(2), radius: dataView.getUint8(3)};
+    const moon = { x: dataView.getInt8(1), y: dataView.getUint8(2), radius: dataView.getUint8(3) };
     addMoon(moon.x, moon.y, moon.radius);
 
     const blocks = [];
-    
+
     let mark = 4;
     while (mark < dataView.byteLength) {
-        const block = {x: dataView.getInt8(mark), y: dataView.getUint8(++mark), width: dataView.getUint8(++mark), height: dataView.getUint8(++mark)};
+        const block = { x: dataView.getInt8(mark), y: dataView.getUint8(++mark), width: dataView.getUint8(++mark), height: dataView.getUint8(++mark) };
         blocks.push(block);
         addBlock(block.x, block.y, block.width, block.height);
         mark++;
@@ -263,7 +262,7 @@ function leaveGame() {
     // document.getElementById("scoreBoardList").innerHTML = ""
 
     hasActiveSession = false;
-    rockets = new Map();
+    rockets = {}
 }
 
 document.getElementById("leaveButton").onclick = (event) => leaveGame()

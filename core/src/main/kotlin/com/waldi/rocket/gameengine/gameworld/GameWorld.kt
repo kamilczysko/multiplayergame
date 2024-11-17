@@ -64,7 +64,7 @@ class GameWorld {
             }
 
             val rocketsData = rocketIdToEntity.values.stream()
-                .map { RocketData(it.x, it.y, it.angle, it.rocketId, it.fuel, it.points) }
+                .map { RocketData(it.x-0.5f, it.y-1.5f, it.angle, it.rocketId, it.fuel, it.points) }
                 .collect(Collectors.toList())
 
             gameTimeStamp++;
@@ -73,7 +73,7 @@ class GameWorld {
         }
         batch.end();
 
-        world.step(1 / 1f, 10, 10);
+        world.step(1 / 60f, 10, 10);
         debug.render(world, camera.combined);
     }
 
@@ -82,7 +82,7 @@ class GameWorld {
     }
 
     fun initRocket(rocketName: String, rocketId: String) {
-        val newRocket = Rocket(rocketId, rocketName, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 2.4f);
+        val newRocket = Rocket(rocketId, rocketName, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 20.1f);
 
         assert(!rocketIdToEntity.contains(rocketId)) { "rocket $rocketId already exists in game" }
 
