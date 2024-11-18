@@ -65,20 +65,29 @@ app.ticker.add((ticker) => {
     elapsed += ticker.deltaTime;
     const myRocket = rocketSprites[getPlayerId()];
     if (myRocket) {
-        scale = lerp(scale, -10, 0.1);
+        scale = lerp(scale, -40, 0.1);
         container.scale.set(scale);
         container.scale.x *= -1;
         container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
         container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
     }
 
-    Object.values(rockets).forEach(rocket => {
-        const r = rocketSprites[rocket.playerId];
-        r.x = lerp(r.x, rocket.x, 0.07);
-        r.y = lerp(r.y, rocket.y, 0.07);
-        r.rotation = lerp(r.rotation, rocket.angle, 0.05)
+    Object.values(rockets).forEach(rocketPositions => {
+            if(rocketPositions.length == 0) {
+                return;
+            }
+            const rocket = rocketPositions.shift();
+            const r = rocketSprites[rocket.playerId];
+            r.x = rocket.x/// lerp(r.x, rocket.x, 0.1);
+            r.y = rocket.y/// lerp(r.y, rocket.y, 0.1);
+            r.rotation = rocket.angle //lerp(r.rotation, rocket.angle, 0.05)        
+            //todo interpolation and anglkes
     })
 })
+
+function interpolate(position, deltaTime) {
+
+}
 
 function lerp(start, end, amt) {
     return (1 - amt) * start + amt * end

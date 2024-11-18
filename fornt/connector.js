@@ -77,7 +77,6 @@ function makeConnection() {
                 decodeMapInfo(event.data);
                 break;
             case 0x05:
-                console.log("Gameplay")
                 decodeRockets(event.data);
                 break;
         }
@@ -110,10 +109,14 @@ function decodeRockets(bytes) {
         mark++;
         const points = dataView.getUint8(mark);
         mark++;
-        rockets[playerId.toString()] = {
-            "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId
+        if (rockets[playerId.toString()]) {
+            rockets[playerId.toString()]
+                .push({ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId })
+
+        } else {
+            rockets[playerId.toString()] = [{ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId }];
+            addRocket(x, y, angle, playerId);
         }
-        addRocket(x, y, angle, playerId);
     }
 }
 
