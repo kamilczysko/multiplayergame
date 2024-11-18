@@ -24,15 +24,6 @@ app.stage.addChild(container);
 
 let elapsed = 0.0;
 
-function getAngle(rocket, mouseX, mouseY) {
-    const deltaX = mouseX - rocket.x;
-    const deltaY = mouseY - rocket.y;
-    const angle = Math.atan2(deltaY, deltaX);
-    return angle;
-}
-
-
-
 app.stage.interactive = true;
 app.stage.eventMode = 'static';
 app.stage.hitArea = app.screen;
@@ -64,8 +55,10 @@ app.stage.on('pointermove', (event) => {
     if(rocket == null) {
         return;
     }
-    const mousePosition = rocket.toLocal(event.data.global);
-    angle = parseInt(getAngle(rocket, mousePosition.x, mousePosition.y) / Math.PI * 100);
+    const mousePosition = container.toLocal(event.data.global);
+    let deltaX = mousePosition.x - rocket.x;
+    let deltaY = mousePosition.y - rocket.y;
+    angle = parseInt(Math.atan2(deltaX, deltaY) / Math.PI * 100);
 });
 
 app.ticker.add((ticker) => {
@@ -77,8 +70,6 @@ app.ticker.add((ticker) => {
         container.scale.x *= -1;
         container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
         container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
-        // container.pivot.x = app.renderer.width / 2
-        // container.pivot.y = app.renderer.height / 1.2
     }
 
     Object.values(rockets).forEach(rocket => {
@@ -86,8 +77,6 @@ app.ticker.add((ticker) => {
         r.x = lerp(r.x, rocket.x, 0.07);
         r.y = lerp(r.y, rocket.y, 0.07);
         r.rotation = lerp(r.rotation, rocket.angle, 0.05)
-        // container.rotation = r.rotation
-        // //add rotation
     })
 })
 
