@@ -43,7 +43,7 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
     }
 
     fun isInMotion(): Boolean {
-        return rocketBody.linearVelocity.len() >= 0.001f;
+        return rocketBody.linearVelocity.len() >= 0.001f || rocketBody.angularVelocity >= 0.01f;
     }
 
     override fun addToWorld(world: World) {

@@ -1,7 +1,9 @@
 import { addMoon, addBlock, addRocket } from "./gameview.js"
 
+
 let socket = null;
 const INIT_NEW_PLAYER = 0x01;
+const MAP_HALF_SIZE = 500; //like on backend
 
 export let rockets = {}
 let timestamp = -1;
@@ -96,14 +98,16 @@ function decodeRockets(bytes) {
     }
     timestamp = serverTimestamp;
     mark += 4;
+    console.log("ength"+ dataView.byteLength)
     while (mark < dataView.byteLength) {
         const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
         // const playerId = String.fromCharCode.apply(null, new Uint8Array(buffer, mark, 5));
         mark += 5;
-        const x = dataView.getInt16(mark);
-        mark += 2;
-        const y = dataView.getInt16(mark);
-        mark += 2;
+        const x = dataView.getFloat64(mark);
+        console.log(x)
+        mark += 8;
+        const y = dataView.getFloat64(mark);
+        mark += 8;
         const angle = dataView.getInt8(mark);
         mark++;
         const fuel = dataView.getUint8(mark);
@@ -114,12 +118,11 @@ function decodeRockets(bytes) {
         const r = rockets[playerId.toString()]
         if (r) {
             if (r[r.length - 1] && r[r.length - 1].x == x && r[r.length - 1].y == y) {
-                return;
+                r.pop();
             }
             r.push({ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId, "start": performance.now() })
-
         } else {
-            rockets[playerId.toString()] = [{ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId, "start": performance.now() }];
+            rockets[playerId.toString()] = [{ "x": x  , "y": y  , "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId, "start": performance.now() }];
             addRocket(x, y, angle, playerId);
         }
     }

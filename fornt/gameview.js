@@ -63,16 +63,17 @@ app.stage.on('pointermove', (event) => {
 
 let lastTimeStamp = performance.now();
 let startTime = 0;
-const duration = 5;
-
+const duration = 2;
+// app.ticker.speed = 2;
 app.ticker.add((delta) => {
+
     const myRocket = rocketSprites[getPlayerId()];
     if (myRocket) {
-        scale = lerp(scale, -10, 0.1);
+        scale = lerp(scale, -30, 0.1);
         container.scale.set(scale);
         container.scale.x *= -1;
-        // container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
-        // container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
+        container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
+        container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
     }
 
     const now = performance.now();
@@ -86,11 +87,8 @@ app.ticker.add((delta) => {
         }
         const rocket = rocketPositions[0];
         const r = rocketSprites[rocket.playerId];
-        // console.log(rocket)
-        // console.log(interpolate(r.x, rocket.x, progress))
         r.x = interpolate(r.x, rocket.x, progress)
         r.y = interpolate(r.y, rocket.y, progress)
-        console.log(rocket.x, rocket.y)
         r.rotation = interpolate(r.rotation, rocket.angle, progress)
         if (progress == 1) {
             rocketPositions.shift();

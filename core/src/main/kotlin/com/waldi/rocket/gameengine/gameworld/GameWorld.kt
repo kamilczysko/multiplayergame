@@ -21,6 +21,9 @@ import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 
 class GameWorld {
+
+    private val MAP_HALF_SIZE = 1000;
+
     private val gravity = Vector2(0.0f, -10.0f)
     private val world: World = World(gravity, false);
     private val camera: OrthographicCamera = OrthographicCamera(100f, 240f);
@@ -66,10 +69,10 @@ class GameWorld {
             }
 
             val rocketsData = rocketIdToEntity.values.stream()
-                .map { RocketData(it.x, it.y + 0.5f, it.angle, it.rocketId, it.fuel, it.points) }
+                .map { RocketData(it.x , it.y, it.angle, it.rocketId, it.fuel, it.points) }
                 .collect(Collectors.toList())
             if(rocket.isInMotion()) {
-                logger.info("IS IN MOTION")
+//                logger.info("sending rocket data")
 //            executor.execute() {
                 gameTimeStamp++;
                 gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
