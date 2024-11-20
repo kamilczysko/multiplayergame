@@ -22,8 +22,6 @@ container.scale.x *= -1;
 
 app.stage.addChild(container);
 
-let elapsed = 0.0;
-
 app.stage.interactive = true;
 app.stage.eventMode = 'static';
 app.stage.hitArea = app.screen;
@@ -63,13 +61,13 @@ app.stage.on('pointermove', (event) => {
 
 let lastTimeStamp = performance.now();
 let startTime = 0;
-const duration = 2;
+const duration = 5;
 // app.ticker.speed = 2;
 app.ticker.add((delta) => {
 
     const myRocket = rocketSprites[getPlayerId()];
     if (myRocket) {
-        scale = lerp(scale, -30, 0.1);
+        scale = lerp(scale, -10, 0.1);
         container.scale.set(scale);
         container.scale.x *= -1;
         container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;

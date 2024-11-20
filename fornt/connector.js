@@ -104,7 +104,6 @@ function decodeRockets(bytes) {
         // const playerId = String.fromCharCode.apply(null, new Uint8Array(buffer, mark, 5));
         mark += 5;
         const x = dataView.getFloat64(mark);
-        console.log(x)
         mark += 8;
         const y = dataView.getFloat64(mark);
         mark += 8;

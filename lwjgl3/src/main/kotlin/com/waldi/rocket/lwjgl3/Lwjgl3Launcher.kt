@@ -13,7 +13,7 @@ fun main() {
       return
     Lwjgl3Application(Main(), Lwjgl3ApplicationConfiguration().apply {
         setTitle("RocketGame")
-        setWindowedMode(560, 1324)
-        setWindowIcon("logo.png")
+        setWindowedMode(640, 480)
+        setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))
     })
 }
