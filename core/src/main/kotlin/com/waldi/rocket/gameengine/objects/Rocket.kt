@@ -2,6 +2,8 @@ package com.waldi.rocket.gameengine.objects
 
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import ktx.log.logger
+import kotlin.math.log
 
 const val ROCKET_WIDTH = 0.5f;
 const val ROCKET_HEIGHT = 1.5f;
@@ -38,6 +40,10 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
             return
         }
         rocketBody.setTransform(rocketBody.position, -angle);
+    }
+
+    fun isInMotion(): Boolean {
+        return rocketBody.linearVelocity.len() >= 0.001f;
     }
 
     override fun addToWorld(world: World) {

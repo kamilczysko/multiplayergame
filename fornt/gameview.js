@@ -48,11 +48,11 @@ app.stage.on('pointerupoutside', (event) => {
 });
 
 app.stage.on('pointermove', (event) => {
-    if(accelerate === false) { 
+    if (accelerate === false) {
         return
     }
     const rocket = rocketSprites[getPlayerId()];
-    if(rocket == null) {
+    if (rocket == null) {
         return;
     }
     const mousePosition = container.toLocal(event.data.global);
@@ -61,32 +61,48 @@ app.stage.on('pointermove', (event) => {
     angle = parseInt(Math.atan2(deltaX, deltaY) / Math.PI * 100);
 });
 
-app.ticker.add((ticker) => {
-    elapsed += ticker.deltaTime;
+let lastTimeStamp = performance.now();
+let startTime = 0;
+const duration = 5;
+
+app.ticker.add((delta) => {
     const myRocket = rocketSprites[getPlayerId()];
     if (myRocket) {
-        scale = lerp(scale, -40, 0.1);
+        scale = lerp(scale, -10, 0.1);
         container.scale.set(scale);
         container.scale.x *= -1;
-        container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
-        container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
+        // container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
+        // container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
     }
 
+    const now = performance.now();
+    lastTimeStamp = now;
+
+    const progress = Math.min((now - startTime) / duration, 1);
+
     Object.values(rockets).forEach(rocketPositions => {
-            if(rocketPositions.length == 0) {
-                return;
-            }
-            const rocket = rocketPositions.shift();
-            const r = rocketSprites[rocket.playerId];
-            r.x = rocket.x/// lerp(r.x, rocket.x, 0.1);
-            r.y = rocket.y/// lerp(r.y, rocket.y, 0.1);
-            r.rotation = rocket.angle //lerp(r.rotation, rocket.angle, 0.05)        
-            //todo interpolation and anglkes
+        if(rocketPositions.length <= 2) {
+            return;
+        }
+        const rocket = rocketPositions[0];
+        const r = rocketSprites[rocket.playerId];
+        // console.log(rocket)
+        // console.log(interpolate(r.x, rocket.x, progress))
+        r.x = interpolate(r.x, rocket.x, progress)
+        r.y = interpolate(r.y, rocket.y, progress)
+        console.log(rocket.x, rocket.y)
+        r.rotation = interpolate(r.rotation, rocket.angle, progress)
+        if (progress == 1) {
+            rocketPositions.shift();
+            startTime = performance.now();
+        }
     })
 })
 
-function interpolate(position, deltaTime) {
-
+function interpolate(start, end, time) {
+    const res = (1 - time) * start + time * end
+    // console.log(start, end, time, res)
+    return res
 }
 
 function lerp(start, end, amt) {
@@ -102,9 +118,9 @@ function getPlayerId() {
 
 export function addBlock(x, y, width, heigth) {
     const block = graphics
-        .rect(x,y , width, heigth)
+        .rect(x, y, width, heigth)
         .fill("white");
-        container.addChild(block);
+    container.addChild(block);
 }
 
 export function addRocket(x, y, angle, playerId) {
@@ -112,7 +128,7 @@ export function addRocket(x, y, angle, playerId) {
         return;
     }
     const block = new PIXI.Graphics()
-        .rect(0, 0 , 1, 3)
+        .rect(0, 0, 1, 3)
         .fill("green");
     container.addChild(block);
     rocketSprites[playerId] = block;
@@ -128,5 +144,5 @@ export function addMoon(x, y, radius) {
     const moon = graphics
         .circle(x, y, radius)
         .fill('white');
-        container.addChild(moon);
+    container.addChild(moon);
 }

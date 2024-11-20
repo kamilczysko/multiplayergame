@@ -33,7 +33,7 @@ onfocus = () => {
 }
 
 function makeConnection() {
-    socket = new WebSocket("ws://127.0.0.1:60231/game");
+    socket = new WebSocket("ws://192.168.8.92:60231/game");
     socket.binaryType = "arraybuffer";
 
     socket.onopen = (e) => {
@@ -86,6 +86,7 @@ function makeConnection() {
 }
 
 function decodeRockets(bytes) {
+
     const buffer = new Uint8Array(bytes).buffer;
     const dataView = new DataView(buffer);
     let mark = 0;
@@ -109,12 +110,16 @@ function decodeRockets(bytes) {
         mark++;
         const points = dataView.getUint8(mark);
         mark++;
-        if (rockets[playerId.toString()]) {
-            rockets[playerId.toString()]
-                .push({ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId })
+
+        const r = rockets[playerId.toString()]
+        if (r) {
+            if (r[r.length - 1] && r[r.length - 1].x == x && r[r.length - 1].y == y) {
+                return;
+            }
+            r.push({ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId, "start": performance.now() })
 
         } else {
-            rockets[playerId.toString()] = [{ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId }];
+            rockets[playerId.toString()] = [{ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId, "start": performance.now() }];
             addRocket(x, y, angle, playerId);
         }
     }

@@ -1,5 +1,6 @@
 package com.waldi.rocket.gameengine.gameworld
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -15,12 +16,13 @@ import ktx.math.random
 import mu.two.KotlinLogging
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 
 class GameWorld {
     private val gravity = Vector2(0.0f, -10.0f)
-    private val world: World = World(gravity, true);
+    private val world: World = World(gravity, false);
     private val camera: OrthographicCamera = OrthographicCamera(100f, 240f);
     private val debug: Box2DDebugRenderer = Box2DDebugRenderer();
     private val batch: Batch = SpriteBatch();
@@ -38,13 +40,14 @@ class GameWorld {
 
     private val logger = KotlinLogging.logger {}
 
+    private val executor = Executors.newFixedThreadPool(10);
+
     init {
         camera.position.set(0.0f, 130.0f, 0.0f);
         camera.zoom += 0.1f;
         camera.update();
         debug.isDrawVelocities = true;
         world.setContactListener(GameContactListener({ rocketId -> scorePoint(rocketId) }));
-
         logger.info { "Starting game engine..." };
     }
 
@@ -53,7 +56,6 @@ class GameWorld {
     }
 
     fun render() {
-
         batch.begin();
         font.draw(batch, "TEST", 510.0f, 1 * 20.0f + 15.0f);
         for ((index, rocket) in rocketIdToEntity.values.withIndex()) {
@@ -66,14 +68,18 @@ class GameWorld {
             val rocketsData = rocketIdToEntity.values.stream()
                 .map { RocketData(it.x, it.y + 0.5f, it.angle, it.rocketId, it.fuel, it.points) }
                 .collect(Collectors.toList())
-
-            gameTimeStamp++;
-            gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
+            if(rocket.isInMotion()) {
+                logger.info("IS IN MOTION")
+//            executor.execute() {
+                gameTimeStamp++;
+                gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
+            }
+//            }
 
         }
         batch.end();
 
-        world.step(1 / 60f, 10, 10);
+        world.step(1/30f, 5, 10);
         debug.render(world, camera.combined);
     }
 
