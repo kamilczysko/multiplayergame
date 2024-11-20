@@ -98,7 +98,6 @@ function decodeRockets(bytes) {
     }
     timestamp = serverTimestamp;
     mark += 4;
-    console.log("ength"+ dataView.byteLength)
     while (mark < dataView.byteLength) {
         const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
         // const playerId = String.fromCharCode.apply(null, new Uint8Array(buffer, mark, 5));

@@ -61,8 +61,8 @@ app.stage.on('pointermove', (event) => {
 
 let lastTimeStamp = performance.now();
 let startTime = 0;
-const duration = 5;
-// app.ticker.speed = 2;
+const duration = 1;
+app.ticker.speed = 2;
 app.ticker.add((delta) => {
 
     const myRocket = rocketSprites[getPlayerId()];
@@ -80,7 +80,8 @@ app.ticker.add((delta) => {
     const progress = Math.min((now - startTime) / duration, 1);
 
     Object.values(rockets).forEach(rocketPositions => {
-        if(rocketPositions.length <= 2) {
+        console.log(rocketPositions.length)
+        if(rocketPositions.length == 0) {
             return;
         }
         const rocket = rocketPositions[0];
