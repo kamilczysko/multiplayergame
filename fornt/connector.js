@@ -3,7 +3,6 @@ import { addMoon, addBlock, addRocket } from "./gameview.js"
 
 let socket = null;
 const INIT_NEW_PLAYER = 0x01;
-const MAP_HALF_SIZE = 500; //like on backend
 
 export let rockets = {}
 let timestamp = -1;
@@ -115,9 +114,9 @@ function decodeRockets(bytes) {
 
         const r = rockets[playerId.toString()]
         if (r) {
-            if (r[r.length - 1] && r[r.length - 1].x == x && r[r.length - 1].y == y) {
-                r.pop();
-            }
+            // if (r[r.length - 1] && r[r.length - 1].x == x && r[r.length - 1].y == y) {
+            //     r.pop();
+            // }
             r.push({ "x": x, "y": y, "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId, "start": performance.now() })
         } else {
             rockets[playerId.toString()] = [{ "x": x  , "y": y  , "angle": (angle / 100) * Math.PI, "fuel": fuel, "points": points, "playerId": playerId, "start": performance.now() }];
@@ -155,11 +154,12 @@ function decodePlayerLeave(bytes) {
     }
 }
 
+export const players = new Map()
+
 function decodeUserListData(bytes) {
     const buffer = new Uint8Array(bytes).buffer;
     const dataView = new DataView(buffer);
     let mark = 1;
-    const players = new Map()
     while (mark < dataView.byteLength) {
         const numberOfBytesForName = dataView.getUint8(mark);
         mark++;
@@ -189,6 +189,8 @@ function decodeNewUser(bytes) {
     document.cookie = `name=${name};`
     document.cookie = `sessionId=${sessionId};`
     document.cookie = `playerId=${playerId};`;
+
+    players[playerId] = { "playerName": name, "points": 0 }
 
     highlightOnScoreboard(playerId);
 }
