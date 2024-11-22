@@ -11,16 +11,21 @@ const rocketSprites = []
 const graphics = new PIXI.Graphics();
 
 const container = new PIXI.Container();
+const containerIndicator = new PIXI.Container();
 
 container.x = app.screen.width / 2;
 container.y = app.screen.height;
 
+
+containerIndicator.x = app.screen.width / 2;
+containerIndicator.y = app.screen.height;
+
 let scale = -10;
 
-// container.scale.set(scale);
 container.scale.x *= -1;
 
 app.stage.addChild(container);
+app.stage.addChild(containerIndicator)
 
 app.stage.interactive = true;
 app.stage.eventMode = 'static';
@@ -66,11 +71,16 @@ app.ticker.add((delta) => {
 
     const myRocket = rocketSprites[getPlayerId()];
     if (myRocket) {
-        scale = lerp(scale, -30, 0.1);
+        scale = lerp(scale, -35, 0.1);
         container.scale.set(scale);
         container.scale.x *= -1;
         container.x = app.renderer.width / 2 - myRocket.x * container.scale.x;
         container.y = app.renderer.height / 1.2 - myRocket.y * container.scale.y;
+
+        containerIndicator.scale.set(scale);
+        containerIndicator.scale.x *= -1;
+        containerIndicator.x = app.renderer.width / 2 - myRocket.x * containerIndicator.scale.x;
+        containerIndicator.y = app.renderer.height / 1.2 - myRocket.y * containerIndicator.scale.y;
     }
 
     const now = performance.now();
@@ -87,8 +97,16 @@ app.ticker.add((delta) => {
         r.x = interpolate(r.x, rocket.x, progress)
         r.y = interpolate(r.y, rocket.y, progress)
         r.rotation = interpolate(r.rotation, rocket.angle, progress)
-        
-        if(rocketNames[rocket.playerId]){
+
+        if (moonIndicator != null) {
+            moonIndicator.visible = Math.sqrt((moonX - r.x)**2 + (moonY - r.y)**2) > 30;
+            
+            moonIndicator.x = (r.x) + (moonX - r.x) * 0.07 ;
+            moonIndicator.y = (r.y) + (moonY - r.y) * 0.07;
+            moonIndicator.rotation = -Math.atan2((moonX - r.x), (moonY - r.y));
+        }   
+
+        if (rocketNames[rocket.playerId]) {
             rocketNames[rocket.playerId][0].x = r.x;
             rocketNames[rocket.playerId][0].y = r.y;
             rocketNames[rocket.playerId][0].rotation = r.rotation;
@@ -107,9 +125,7 @@ app.ticker.add((delta) => {
 })
 
 function interpolate(start, end, time) {
-    const res = (1 - time) * start + time * end
-    // console.log(start, end, time, res)
-    return res
+    return (1 - time) * start + time * end
 }
 
 function lerp(start, end, amt) {
@@ -174,10 +190,28 @@ export function addRocket(x, y, angle, playerId) {
     block.rotate = 0;
 }
 
-
+let moonIndicator = null;
+let moonX = 0;
+let moonY = 0;
+let moon = null;
 export function addMoon(x, y, radius) {
-    const moon = graphics
+    moonIndicator = new PIXI.Graphics();//.circle(0, 0, .5).fill('white');
+    
+    moonIndicator.beginFill(0xff0000); // Wypełnienie w kolorze czerwonym
+    moonIndicator.lineStyle(0.2, "white"); // Linie w kolorze białym
+    moonIndicator.moveTo(0, 0.001); // Pierwszy wierzchołek
+    moonIndicator.lineTo(-0.001, 0); // Drugi wierzchołek
+    moonIndicator.lineTo(0.001, 0); // Trzeci wierzchołek
+    moonIndicator.closePath(); // Zamknięcie kształtu
+    moonIndicator.endFill();
+
+    moonX = x;
+    moonY = y;
+
+    moon = graphics
         .circle(x, y, radius)
         .fill('white');
+    moon.uid="debil"
+    containerIndicator.addChild(moonIndicator)
     container.addChild(moon);
 }
