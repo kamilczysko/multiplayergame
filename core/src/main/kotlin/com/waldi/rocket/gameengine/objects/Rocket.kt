@@ -7,7 +7,7 @@ import kotlin.math.log
 
 const val ROCKET_WIDTH = 0.5f;
 const val ROCKET_HEIGHT = 1.5f;
-const val THRUST_FORCE = 15f;
+const val THRUST_FORCE = 17f;
 
 private const val FUEL_CONSUMPTION = 0.0009f
 

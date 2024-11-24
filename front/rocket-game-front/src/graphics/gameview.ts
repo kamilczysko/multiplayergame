@@ -2,8 +2,6 @@ import * as PIXI from "pixi.js";
 import { Rocket } from "../infrastructure/rocket";
 import { Level } from "../infrastructure/level";
 import { rockets, sendSteeringAction } from "../connection/controller";
-// import { diffuseGroup, normalGroup, lightGroup } from "@pixi/lights";
-// import { Layer } from "@pixi/layers";
 
 let accelerateRocket: boolean = false;
 let interval: any;
@@ -13,8 +11,6 @@ const containerIndicator = new PIXI.Container();
 const containerFire = new PIXI.Container();
 const backgroundContainer = new PIXI.Container();
 
-
-// (async () => {
 const app = new PIXI.Application({
   resizeTo: window,
   background: "#211753",
@@ -85,7 +81,7 @@ app.ticker.add((delta) => {
     containerFire.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x;
     containerFire.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y;
 
-    backgroundContainer.x = myRocket.getRocketAcutalPosition().x;
+    backgroundContainer.x = myRocket.getRocketAcutalPosition().x - 100;
     backgroundContainer.y = (myRocket.getRocketAcutalPosition().y - 500) * 1.1;
 
     if (moonIndicator == null) {
@@ -147,7 +143,6 @@ app.stage.on("pointermove", (event) => {
   let deltaY = mousePosition.y - rocket.getRocketAcutalPosition().y;
   angle = (Math.atan2(deltaX, deltaY) / Math.PI) * 100;
 });
-// })();
 
 export function drawLevel(level: Level) {
   moonX = level.moonX;
