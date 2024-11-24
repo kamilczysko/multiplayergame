@@ -13,14 +13,7 @@ export class Rocket {
 
   accelerating: boolean = false;
 
-  constructor(
-    x: number,
-    y: number,
-    angle: number,
-    fuel: number,
-    name: string,
-    rocketId: string,
-  ) {
+  constructor(x: number, y: number, angle: number, fuel: number, name: string, rocketId: string,) {
     this.rocketStatus = [{ x: x, y: y, angle: angle, fuel: fuel }];
     this.rocketId = rocketId;
     this.name = name;
@@ -75,12 +68,12 @@ export class Rocket {
       upgradeConfig(
         {
           "alpha": {
-            "start": 1,
+            "start": 0.45,
             "end": 1
           },
           "scale": {
-            "start": 0.007,
-            "end": 0.01,
+            "start": 0.0051,
+            "end": 0.0003,
             "minimumScaleMultiplier": 10
           },
           "color": {
@@ -88,9 +81,9 @@ export class Rocket {
             "end": "#ff0000"
           },
           "speed": {
-            "start": 100,
+            "start": 5,
             "end": 50,
-            "minimumSpeedMultiplier": 1.02
+            "minimumSpeedMultiplier": 0.5
           },
           "acceleration": {
             "x": 9,
@@ -103,17 +96,17 @@ export class Rocket {
           },
           "noRotation": false,
           "rotationSpeed": {
-            "min": 10,
+            "min": 100,
             "max": 7
           },
           "lifetime": {
-            "min": 2,
-            "max": 0.9
+            "min": 0.3,
+            "max": 0.6
           },
           "blendMode": "screen",
           "frequency": 0.001,
-          "emitterLifetime": -0.93,
-          "maxParticles": 500,
+          "emitterLifetime": -1,
+          "maxParticles": 210,
           "pos": {
             "x": 0,
             "y": 0
@@ -134,17 +127,23 @@ export class Rocket {
   }
 
   animate(delta: number) {
-    this.fire?.update(this.accelerating ? 0.008 : 0.0007);
-    this.fire?.updateSpawnPos(this.rocketSprite!.x, this.rocketSprite!.y - 1.5);
+    this.fire?.update(this.accelerating ? 0.01 : 0.005);
+    this.fire?.updateSpawnPos(this.rocketSprite!.x, this.rocketSprite!.y - 0.5);
 
     if (!this.rocketSprite || this.rocketStatus.length == 0) {
       return;
     }
-    const goalPos = this.rocketStatus[0];
 
-    this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, goalPos.x, delta);
-    this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, goalPos.y, delta);
-    this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, goalPos.angle, delta);
+    let goalPos = this.rocketStatus.shift();
+    if (this.rocketStatus.length >= 10) {
+      goalPos = this.rocketStatus.shift(); //jump
+    }
+    if (this.rocketStatus.length >= 30) {
+      goalPos = this.rocketStatus.shift(); //jump
+    }
+    this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, goalPos!.x, delta);
+    this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, goalPos!.y, delta);
+    this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, goalPos!.angle, delta);
 
     this.nameLabel!.x = this.rocketSprite!.x;
     this.nameLabel!.y = this.rocketSprite!.y;
@@ -153,11 +152,7 @@ export class Rocket {
     this.fuelLabel!.x = this.rocketSprite!.x;
     this.fuelLabel!.y = this.rocketSprite!.y;
     this.fuelLabel!.rotation = this.rocketSprite!.rotation;
-    this.fuelLabel!.text = `${goalPos.fuel}%`
-
-    if (delta == 1) {
-      this.rocketStatus.shift();
-    }
+    this.fuelLabel!.text = `${goalPos!.fuel}%`;
   }
 
   private interpolate(start: number, end: number, time: number) {
@@ -172,10 +167,10 @@ export class Rocket {
     };
   }
 
-  addToContainer(rocketContainer: Container) {
-    this.initFire(rocketContainer);
+  addToContainer(rocketContainer: Container, otherContainer: Container) {
     rocketContainer.addChild(this.fuelLabel!);
     rocketContainer.addChild(this.nameLabel!);
     rocketContainer.addChild(this.rocketSprite!)
+    this.initFire(otherContainer);
   }
 }

@@ -100,7 +100,6 @@ function decodeMapInfo(bytes: ArrayBuffer) {
     y: dataView.getUint8(2),
     radius: dataView.getUint8(3),
   };
-
   newLevel.setMoon(moon.x, moon.y, moon.radius);
 
   let mark = 4;

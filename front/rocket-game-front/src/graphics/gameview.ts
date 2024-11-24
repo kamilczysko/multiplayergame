@@ -8,12 +8,14 @@ let interval: any;
 
 const container = new PIXI.Container();
 const containerIndicator = new PIXI.Container();
+const containerFire = new PIXI.Container();
 
 // (async () => {
 const app = new PIXI.Application({
   width: 1200,
   height: 760,
   background: "#1099bb",
+  forceCanvas: false
 });
 
 app.stage.interactive = true;
@@ -29,19 +31,24 @@ container.scale.x *= -1;
 containerIndicator.x = app.screen.width / 2;
 containerIndicator.y = app.screen.height;
 
+containerFire.x = app.screen.width / 2;
+containerFire.y = app.screen.height;
+
+app.stage.addChild(containerFire);
 app.stage.addChild(container);
 app.stage.addChild(containerIndicator);
 
 let scale = -10;
 container.scale.set(scale)
 containerIndicator.scale.set(scale)
+containerFire.scale.set(scale)
 
-let moon: PIXI.Graphics | null = null;
-
+let moonX = 0;
+let moonY = 0;
 let moonIndicator: PIXI.Graphics | null | undefined = null;
 
 let elapsedTime = 0;
-let animationDuration = 2;
+let animationDuration = 1;
 
 app.ticker.add((delta) => {
   elapsedTime += app.ticker.elapsedMS;
@@ -55,17 +62,22 @@ app.ticker.add((delta) => {
     container.scale.set(scale);
     container.scale.x *= -1;
     container.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * container.scale.x;
-    container.y = app.renderer.height / 1.2 - myRocket.getRocketAcutalPosition().y * container.scale.y;
+    container.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * container.scale.y;
 
     containerIndicator.scale.set(scale);
     containerIndicator.scale.x *= -1;
     containerIndicator.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x;
-    containerIndicator.y = app.renderer.height / 1.2 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y;
+    containerIndicator.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y;
+
+    containerFire.scale.set(scale);
+    containerFire.scale.x *= -1;
+    containerFire.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x;
+    containerFire.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y;
 
     if (moonIndicator == null) {
       moonIndicator = new PIXI.Graphics();
       moonIndicator.beginFill(0xffffff);
-      moonIndicator.lineStyle(0.2, 0xffffff);
+      moonIndicator.lineStyle(0.2, 0x000000);
       moonIndicator.moveTo(0, 0.001);
       moonIndicator.lineTo(-0.001, 0);
       moonIndicator.lineTo(0.001, 0);
@@ -76,10 +88,10 @@ app.ticker.add((delta) => {
     }
 
     if (moonIndicator != null) {
-      moonIndicator.visible = Math.sqrt((moon!.x - myRocket.getRocketAcutalPosition().x) ** 2 + (moon!.y - myRocket.getRocketAcutalPosition().y) ** 2) > 30;
-      moonIndicator.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x// myRocket.getRocketAcutalPosition().x + (moon!.x - myRocket.getRocketAcutalPosition().x) * 0.07;
-      moonIndicator.y = app.renderer.height / 1.2 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y + 4//myRocket.getRocketAcutalPosition().y + (moon!.y - myRocket.getRocketAcutalPosition().y) * 0.07;
-      moonIndicator.rotation = Math.atan2(moon!.x - myRocket.getRocketAcutalPosition().x, moon!.y - myRocket.getRocketAcutalPosition().y) + Math.PI;
+      moonIndicator.visible = Math.sqrt((moonX - myRocket.getRocketAcutalPosition().x) ** 2 + (moonY - myRocket.getRocketAcutalPosition().y) ** 2) > 30;
+      moonIndicator.x = myRocket.getRocketAcutalPosition().x + (moonX - myRocket.getRocketAcutalPosition().x) * 0.028;
+      moonIndicator.y = myRocket.getRocketAcutalPosition().y + (moonY - myRocket.getRocketAcutalPosition().y) * 0.028;
+      moonIndicator.rotation = -Math.atan2(moonX - myRocket.getRocketAcutalPosition().x, moonY - myRocket.getRocketAcutalPosition().y);
     }
   }
 
@@ -93,14 +105,15 @@ let angle = 0;
 
 app.stage.on("pointerdown", () => {
   accelerateRocket = true;
-  interval = setInterval(
-    () => sendSteeringAction(angle, accelerateRocket), 100);
+  interval = setInterval(() => sendSteeringAction(angle, accelerateRocket), 100);
 });
+
 app.stage.on("pointerup", () => {
   accelerateRocket = false;
   clearInterval(interval);
   sendSteeringAction(angle, false);
 });
+
 app.stage.on("pointerupoutside", () => {
   accelerateRocket = false;
   clearInterval(interval);
@@ -122,9 +135,20 @@ app.stage.on("pointermove", (event) => {
 });
 // })();
 
+const light = new PIXI.Graphics();
+light.beginFill(0xffff00, 1); // Żółte światło
+light.drawCircle(0, 0, 150);  // Promień światła 150 pikseli
+light.endFill();
+light.blendMode = PIXI.BLEND_MODES.ADD; // Dodaje kolor, rozjaśniając
+light.position.set(0, 0);
+app.stage.addChild(light);
+
+containerFire.addChild(light)
+
 
 export function drawLevel(level: Level) {
-  moon = level.moon;
+  moonX = level.moonX;
+  moonY = level.moonY;
   level.drawLevel(containerIndicator);
 }
 
@@ -139,5 +163,5 @@ function getCookieValue(key: string): string {
     .map((sessionChunk) => sessionChunk.split("=")[1])[0];
 }
 export function addRocketToView(rocket: Rocket) {
-  rocket.addToContainer(container);
+  rocket.addToContainer(container, containerFire);
 }
