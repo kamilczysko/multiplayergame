@@ -1,5 +1,5 @@
 import { Emitter, upgradeConfig } from "@pixi/particle-emitter";
-import { BitmapText, Container, Graphics, Text, TextStyle, Texture } from "pixi.js";
+import { Container, Graphics, Text, Texture } from "pixi.js";
 
 export class Rocket {
   private rocketStatus: { x: number; y: number; angle: number, fuel: number }[] = [];
@@ -32,12 +32,12 @@ export class Rocket {
 
   private initRocketSprite() {
     this.rocketSprite = new Graphics();
-    this.rocketSprite.beginFill(0xffffff);
+    this.rocketSprite.beginFill(0x00ff00);
     this.rocketSprite.drawRect(this.rocketStatus[0].x, this.rocketStatus[0].y, 1, 3);
     this.rocketSprite.endFill();
 
-    this.rocketSprite.pivot.x = 0.5;
-    this.rocketSprite.pivot.y = 1.5;
+    this.rocketSprite.pivot.x = this.rocketStatus[0].x + 0.5;
+    this.rocketSprite.pivot.y = this.rocketStatus[0].y + 1.5;
     this.rocketSprite.x = this.rocketStatus[0].x;
     this.rocketSprite.y = this.rocketStatus[0].y;
   }
@@ -45,29 +45,28 @@ export class Rocket {
   private initFuelLabel(fuel: number) {
     this.fuelLabel = new Text(`${fuel}%`, {
       fontFamily: 'Roboto',
-      fontSize: 12
+      fontSize: 16
     });
 
-    this.fuelLabel.scale.y *= -1;
     this.fuelLabel.x = this.rocketStatus[0].x;
     this.fuelLabel.y = this.rocketStatus[0].y;
-    this.fuelLabel.pivot.x = +1.3;
-    this.fuelLabel.pivot.y = +4;
-    this.fuelLabel.scale.set(0.1);
+    this.fuelLabel.anchor.y = 3.9;
+    this.fuelLabel.anchor.x = 0.5;
+    this.fuelLabel.scale.set(-0.03);
+    this.fuelLabel.scale.x *= -1;
   }
 
   private initNameLabel(name: string) {
     this.nameLabel = new Text(`${name}`, {
       fontFamily: 'Roboto',
-      fontSize: 12
+      fontSize: 16
     });
 
-    this.nameLabel.scale.y *= -1;
     this.nameLabel.x = this.rocketStatus[0].x;
     this.nameLabel.y = this.rocketStatus[0].y;
-    this.nameLabel.pivot.x = -1;
-    this.nameLabel.pivot.y = +0.5;
-    this.nameLabel.scale.set(0.1);
+    this.nameLabel.anchor.x = -0.7;
+    this.nameLabel.scale.set(-0.03);
+    this.nameLabel.scale.x *= -1;
   }
 
   private initFire(container: Container) {
@@ -75,57 +74,52 @@ export class Rocket {
       container,
       upgradeConfig(
         {
-          alpha: {
-            start: 1,
-            end: 1,
+          "alpha": {
+            "start": 1,
+            "end": 1
           },
-          scale: {
-            start: 0.2,
-            end: 0.01,
-            minimumScaleMultiplier: 7,
+          "scale": {
+            "start": 0.007,
+            "end": 0.01,
+            "minimumScaleMultiplier": 10
           },
-          color: {
-            start: "#ffd900",
-            end: "#ff0000",
+          "color": {
+            "start": "#ffd900",
+            "end": "#ff0000"
           },
-          speed: {
-            start: 100,
-            end: 50,
-            minimumSpeedMultiplier: 1,
+          "speed": {
+            "start": 100,
+            "end": 50,
+            "minimumSpeedMultiplier": 1.02
           },
-          acceleration: {
-            x: 9,
-            y: 0,
+          "acceleration": {
+            "x": 9,
+            "y": 0
           },
-          maxSpeed: 0,
-          startRotation: {
-            min: 0,
-            max: 360,
+          "maxSpeed": 0,
+          "startRotation": {
+            "min": 0,
+            "max": 360
           },
-          noRotation: false,
-          rotationSpeed: {
-            min: 10,
-            max: 7,
+          "noRotation": false,
+          "rotationSpeed": {
+            "min": 10,
+            "max": 7
           },
-          lifetime: {
-            min: 2,
-            max: 0.9,
+          "lifetime": {
+            "min": 2,
+            "max": 0.9
           },
-          blendMode: "normal",
-          frequency: 0.001,
-          emitterLifetime: -1,
-          maxParticles: 1000,
-          pos: {
-            x: this.rocketStatus[0].x,
-            y: this.rocketStatus[0].y - 1,
+          "blendMode": "screen",
+          "frequency": 0.001,
+          "emitterLifetime": -0.93,
+          "maxParticles": 500,
+          "pos": {
+            "x": 0,
+            "y": 0
           },
-          addAtBack: false,
-          spawnType: "circle",
-          spawnCircle: {
-            x: 3, //tu było 6
-            y: 0,
-            r: 0,
-          },
+          "addAtBack": false,
+          "spawnType": "point"
         },
         [Texture.from("particle.jpg")]
       )
@@ -140,10 +134,14 @@ export class Rocket {
   }
 
   animate(delta: number) {
-    if (!this.rocketSprite) {
+    this.fire?.update(this.accelerating ? 0.008 : 0.0007);
+    this.fire?.updateSpawnPos(this.rocketSprite!.x, this.rocketSprite!.y - 1.5);
+
+    if (!this.rocketSprite || this.rocketStatus.length == 0) {
       return;
     }
     const goalPos = this.rocketStatus[0];
+
     this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, goalPos.x, delta);
     this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, goalPos.y, delta);
     this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, goalPos.angle, delta);
@@ -155,14 +153,13 @@ export class Rocket {
     this.fuelLabel!.x = this.rocketSprite!.x;
     this.fuelLabel!.y = this.rocketSprite!.y;
     this.fuelLabel!.rotation = this.rocketSprite!.rotation;
-
-    this.fire?.update(this.accelerating ? 0.1 : 0.001);
-    this.fire?.updateSpawnPos(this.rocketSprite!.x, this.rocketSprite!.y);
+    this.fuelLabel!.text = `${goalPos.fuel}%`
 
     if (delta == 1) {
       this.rocketStatus.shift();
     }
   }
+
   private interpolate(start: number, end: number, time: number) {
     return (1 - time) * start + time * end;
   }
@@ -175,10 +172,10 @@ export class Rocket {
     };
   }
 
-  addToContainer(container: Container) {
-    this.initFire(container);
-    container.addChild(this.rocketSprite!)
-    container.addChild(this.fuelLabel!);
-    container.addChild(this.nameLabel!);
+  addToContainer(rocketContainer: Container) {
+    this.initFire(rocketContainer);
+    rocketContainer.addChild(this.fuelLabel!);
+    rocketContainer.addChild(this.nameLabel!);
+    rocketContainer.addChild(this.rocketSprite!)
   }
 }

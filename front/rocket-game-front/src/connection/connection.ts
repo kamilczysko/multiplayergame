@@ -1,4 +1,4 @@
-import { readMessage } from "./controller";
+import { initSocket, readMessage } from "./controller";
 
 export class Connector {
 
@@ -10,6 +10,7 @@ export class Connector {
         this.socket.onopen = () => {
             console.log("Connection opened...");
             this.socket?.send(joinFunction());
+            initSocket(this.socket!)
         }
 
         this.socket.onmessage = (msg: MessageEvent) => {

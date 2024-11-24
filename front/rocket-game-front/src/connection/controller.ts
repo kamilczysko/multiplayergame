@@ -136,7 +136,7 @@ function decodeRockets(bytes: ArrayBuffer) {
     mark += 8;
     const y = dataView.getFloat64(mark);
     mark += 8;
-    const angle = dataView.getInt8(mark);
+    const angle = dataView.getInt8(mark) / 100 * Math.PI;
     mark++;
     const fuel = dataView.getUint8(mark);
     mark++;
@@ -146,7 +146,6 @@ function decodeRockets(bytes: ArrayBuffer) {
     const rocket: Rocket = rockets[playerId];
     if (!rocket) {
       rockets[playerId] = new Rocket(x, y, angle, fuel, players[playerId]?.playerName, playerId);
-      console.log(rockets)
       addRocketToView(rockets[playerId]);
     } else {
       rocket.addRocketState(x, y, angle, fuel);
@@ -181,12 +180,19 @@ function leaveGame(socket: WebSocket) {
   setCookie("playerId", "");
 }
 
+let socket: WebSocket;
+
+export function initSocket(soc: WebSocket) {
+  socket = soc;
+}
+
 export function sendSteeringAction(angle: number, accelerate: boolean): Int8Array {
   const buffer = new Int8Array(3);
   buffer[0] = 0x06;
   buffer[1] = angle;
   buffer[2] = accelerate ? 1 : 0;
 
+  socket?.send(buffer);
   return buffer;
 }
 

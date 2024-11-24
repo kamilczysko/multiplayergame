@@ -1,10 +1,13 @@
 import * as PIXI from "pixi.js";
 import { Rocket } from "../infrastructure/rocket";
 import { Level } from "../infrastructure/level";
-import { rockets } from "../connection/controller";
+import { rockets, sendSteeringAction } from "../connection/controller";
 
 let accelerateRocket: boolean = false;
 let interval: any;
+
+const container = new PIXI.Container();
+const containerIndicator = new PIXI.Container();
 
 // (async () => {
 const app = new PIXI.Application({
@@ -19,11 +22,8 @@ app.stage.hitArea = app.screen;
 
 document.getElementById("gameplay")!.appendChild(app.view);
 
-const container = new PIXI.Container();
-const containerIndicator = new PIXI.Container();
-
 container.x = app.screen.width / 2;
-container.y = app.screen.height / 2;
+container.y = app.screen.height;
 container.scale.x *= -1;
 
 containerIndicator.x = app.screen.width / 2;
@@ -33,13 +33,24 @@ app.stage.addChild(container);
 app.stage.addChild(containerIndicator);
 
 let scale = -10;
-let moonIndicator: PIXI.Graphics | null = null;
+container.scale.set(scale)
+containerIndicator.scale.set(scale)
+
 let moon: PIXI.Graphics | null = null;
 
+let moonIndicator: PIXI.Graphics | null | undefined = null;
+
+let elapsedTime = 0;
+let animationDuration = 2;
+
 app.ticker.add((delta) => {
-  console.log(getCookieValue("playerId"))
+  elapsedTime += app.ticker.elapsedMS;
+  const progress = Math.min(elapsedTime / animationDuration, 1);
   const myRocket = rockets[getCookieValue("playerId")];
   if (myRocket) {
+    myRocket.accelerating = accelerateRocket;
+    myRocket.animate(1);
+
     scale = lerp(scale, -35, 0.1);
     container.scale.set(scale);
     container.scale.x *= -1;
@@ -51,79 +62,70 @@ app.ticker.add((delta) => {
     containerIndicator.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x;
     containerIndicator.y = app.renderer.height / 1.2 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y;
 
+    if (moonIndicator == null) {
+      moonIndicator = new PIXI.Graphics();
+      moonIndicator.beginFill(0xffffff);
+      moonIndicator.lineStyle(0.2, 0xffffff);
+      moonIndicator.moveTo(0, 0.001);
+      moonIndicator.lineTo(-0.001, 0);
+      moonIndicator.lineTo(0.001, 0);
+      moonIndicator.closePath();
+      moonIndicator.endFill();
+
+      containerIndicator.addChild(moonIndicator);
+    }
+
     if (moonIndicator != null) {
       moonIndicator.visible = Math.sqrt((moon!.x - myRocket.getRocketAcutalPosition().x) ** 2 + (moon!.y - myRocket.getRocketAcutalPosition().y) ** 2) > 30;
-      moonIndicator.x = myRocket.getRocketAcutalPosition().x + (moon!.x - myRocket.getRocketAcutalPosition().x) * 0.07;
-      moonIndicator.y = myRocket.getRocketAcutalPosition().y + (moon!.y - myRocket.getRocketAcutalPosition().y) * 0.07;
-      moonIndicator.rotation = -Math.atan2(moon!.x - myRocket.getRocketAcutalPosition().x, moon!.y - myRocket.getRocketAcutalPosition().y);
+      moonIndicator.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x// myRocket.getRocketAcutalPosition().x + (moon!.x - myRocket.getRocketAcutalPosition().x) * 0.07;
+      moonIndicator.y = app.renderer.height / 1.2 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y + 4//myRocket.getRocketAcutalPosition().y + (moon!.y - myRocket.getRocketAcutalPosition().y) * 0.07;
+      moonIndicator.rotation = Math.atan2(moon!.x - myRocket.getRocketAcutalPosition().x, moon!.y - myRocket.getRocketAcutalPosition().y) + Math.PI;
     }
   }
 
+  if (progress == 1) {
+    elapsedTime = 0;
+  }
 
 });
 
-app.stage.on("pointerdown", (event) => {
+let angle = 0;
+
+app.stage.on("pointerdown", () => {
   accelerateRocket = true;
   interval = setInterval(
-    () =>
-      //sendSteeringAction(angle, accelerateRocket),
-      100
-  );
+    () => sendSteeringAction(angle, accelerateRocket), 100);
 });
-app.stage.on("pointerup", (event) => {
+app.stage.on("pointerup", () => {
   accelerateRocket = false;
   clearInterval(interval);
-  //sendSteeringAction(angle, false);
+  sendSteeringAction(angle, false);
 });
-app.stage.on("pointerupoutside", (event) => {
+app.stage.on("pointerupoutside", () => {
   accelerateRocket = false;
   clearInterval(interval);
-  //sendSteeringAction(angle, false);
+  sendSteeringAction(angle, false);
 });
 
 app.stage.on("pointermove", (event) => {
-  // if (accelerateRocket === false) {
-  //   return;
-  // }
-  // const rocket = rocketSprites[getPlayerId()];
-  // if (rocket == null) {
-  //   return;
-  // }
-  // const mousePosition = container.toLocal(event.data.global);
-  // let deltaX = mousePosition.x - rocket.x;
-  // let deltaY = mousePosition.y - rocket.y;
-  // angle = parseInt((Math.atan2(deltaX, deltaY) / Math.PI) * 100);
+  if (accelerateRocket === false) {
+    return;
+  }
+  const rocket = rockets[getCookieValue("playerId")];
+  if (rocket == null) {
+    return;
+  }
+  const mousePosition = container.toLocal(event.data.global);
+  let deltaX = mousePosition.x - rocket.getRocketAcutalPosition().x;
+  let deltaY = mousePosition.y - rocket.getRocketAcutalPosition().y;
+  angle = (Math.atan2(deltaX, deltaY) / Math.PI) * 100;
 });
 // })();
 
+
 export function drawLevel(level: Level) {
-  level.drawLevel(container);
-}
-
-function drawMoonIndicator(
-  x: number,
-  y: number,
-  radius: number
-): PIXI.Graphics {
-  moonIndicator = new PIXI.Graphics();
-
-  moonIndicator.beginFill(0xffffff);
-  moonIndicator.lineStyle(0.2, 0xffffff);
-  moonIndicator.moveTo(0, 0.001);
-  moonIndicator.lineTo(-0.001, 0);
-  moonIndicator.lineTo(0.001, 0);
-  moonIndicator.closePath();
-  moonIndicator.endFill();
-
-  return moonIndicator;
-}
-
-function drawMoon(x: number, y: number, radius: number): PIXI.Graphics {
-  moon = new PIXI.Graphics();
-  moon.beginFill(0xffffff);
-  moon.drawCircle(x, y, radius);
-  moon.endFill();
-  return moon;
+  moon = level.moon;
+  level.drawLevel(containerIndicator);
 }
 
 function lerp(start: number, end: number, amt: number) {
@@ -136,7 +138,6 @@ function getCookieValue(key: string): string {
     .filter((chunk) => chunk.includes(key))
     .map((sessionChunk) => sessionChunk.split("=")[1])[0];
 }
-
 export function addRocketToView(rocket: Rocket) {
   rocket.addToContainer(container);
 }
