@@ -1,5 +1,7 @@
 import { Emitter, upgradeConfig } from "@pixi/particle-emitter";
-import { Container, Graphics, Text, Texture } from "pixi.js";
+import { Container, Graphics, Text, Texture, lights } from "pixi.js";
+import { Layer, Stage } from '@pixi/layers';
+import { diffuseGroup, normalGroup, lightGroup, PointLight } from '@pixi/lights';
 
 export class Rocket {
   private rocketStatus: { x: number; y: number; angle: number, fuel: number }[] = [];
@@ -10,6 +12,8 @@ export class Rocket {
   private fuelLabel: Text | undefined;
   private nameLabel: Text | undefined;
   private fire: Emitter | undefined;
+
+  private fireLight = new PointLight(0xffffff, 5);
 
   accelerating: boolean = false;
 
@@ -127,23 +131,30 @@ export class Rocket {
   }
 
   animate(delta: number) {
-    this.fire?.update(this.accelerating ? 0.01 : 0.005);
+    this.fire?.update(this.accelerating && this.rocketStatus[0]?.fuel > 0 ? 0.03 : 0.005);
     this.fire?.updateSpawnPos(this.rocketSprite!.x, this.rocketSprite!.y - 0.5);
+
+    this.fireLight.x = this.rocketSprite!.x;
+    this.fireLight.y = this.rocketSprite!.y;
 
     if (!this.rocketSprite || this.rocketStatus.length == 0) {
       return;
     }
 
-    let goalPos = this.rocketStatus.shift();
+    let recentStatus = this.rocketStatus.shift();
+
     if (this.rocketStatus.length >= 10) {
-      goalPos = this.rocketStatus.shift(); //jump
+      recentStatus = this.rocketStatus.shift(); //jump
     }
     if (this.rocketStatus.length >= 30) {
-      goalPos = this.rocketStatus.shift(); //jump
+      recentStatus = this.rocketStatus.shift(); //jump
     }
-    this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, goalPos!.x, delta);
-    this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, goalPos!.y, delta);
-    this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, goalPos!.angle, delta);
+    if (this.rocketStatus.length >= 50) {
+      recentStatus = this.rocketStatus.shift(); //jump
+    }
+    this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, recentStatus!.x, delta);
+    this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, recentStatus!.y, delta);
+    this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
 
     this.nameLabel!.x = this.rocketSprite!.x;
     this.nameLabel!.y = this.rocketSprite!.y;
@@ -152,7 +163,7 @@ export class Rocket {
     this.fuelLabel!.x = this.rocketSprite!.x;
     this.fuelLabel!.y = this.rocketSprite!.y;
     this.fuelLabel!.rotation = this.rocketSprite!.rotation;
-    this.fuelLabel!.text = `${goalPos!.fuel}%`;
+    this.fuelLabel!.text = `${recentStatus!.fuel}%`;
   }
 
   private interpolate(start: number, end: number, time: number) {
@@ -172,5 +183,6 @@ export class Rocket {
     rocketContainer.addChild(this.nameLabel!);
     rocketContainer.addChild(this.rocketSprite!)
     this.initFire(otherContainer);
+    otherContainer.addChild(this.fireLight);
   }
 }
