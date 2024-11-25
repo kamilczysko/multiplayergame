@@ -6,7 +6,6 @@ import io.netty.buffer.ByteBuf
 class SteerDecoder: MessageDecoder<SteeringMessage> {
     override fun decode(bytes: ByteBuf): SteeringMessage {
         val angleFromBytes = bytes.readByte().toInt()
-        println("FROM BYTES: "+ angleFromBytes)
         val angle = ((angleFromBytes / 100.0) * Math.PI).toFloat();
         bytes.readerIndex(2);
         val isAccelerating = bytes.readBoolean();

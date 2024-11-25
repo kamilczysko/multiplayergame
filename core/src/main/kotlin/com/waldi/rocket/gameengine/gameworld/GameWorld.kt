@@ -31,6 +31,7 @@ class GameWorld {
     private lateinit var mapHash: String;
 
     private lateinit var gameController: GameController;
+    private var gameContactListener: GameContactListener;
 
     private var gameTimeStamp: Int = 0;
 
@@ -43,7 +44,8 @@ class GameWorld {
 //        camera.zoom += 0.1f;
 //        camera.update();
 //        debug.isDrawVelocities = true;
-        world.setContactListener(GameContactListener({ rocketId -> scorePoint(rocketId) }));
+        gameContactListener = GameContactListener({ rocketId -> scorePoint(rocketId) });
+        world.setContactListener(gameContactListener);
         logger.info { "Starting game engine..." };
     }
 
@@ -56,35 +58,32 @@ class GameWorld {
 //        font.draw(batch, "TEST", 510.0f, 1 * 20.0f + 15.0f);
         for ((index, rocket) in rocketIdToEntity.values.withIndex()) {
 //            font.draw(batch, "${rocket.name} ${(rocket.fuel * 100).toInt()}%", 10.0f, index * 20.0f + 15.0f);
-
             if (rocket.isAccelerating) {
                 rocket.accelerate();
             }
-
             val rocketsData = rocketIdToEntity.values.stream()
-                .map { RocketData(it.x , it.y, it.angle, it.rocketId, it.fuel, it.points) }
+                .map { RocketData(it.x, it.y, it.angle, it.rocketId, it.fuel, it.points) }
                 .collect(Collectors.toList())
-            if(rocket.isInMotion()) {
-                logger.info("sending rocket data")
-            executor.execute() {
-                gameTimeStamp++;
-                gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
+            if (rocket.isInMotion()) {
+                executor.execute() {
+                    gameTimeStamp++;
+                    gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
+                }
             }
-            }
-
-            if(rocket.y < -500) {
+            if (rocket.y < -500) {
                 resetRocket(rocket)
             }
-
         }
+        gameContactListener.update();
 //        batch.end();
 
-        world.step(1/30f, 5, 10);
+        world.step(1 / 30f, 5, 10);
 //        debug.render(world, camera.combined);
     }
 
     private fun scorePoint(rocketId: String) {
         rocketIdToEntity[rocketId]?.addPoint() ?: return;
+        resetRocket(rocketId);
     }
 
     fun initRocket(rocketName: String, rocketId: String) {
@@ -108,7 +107,7 @@ class GameWorld {
 
     fun resetRocket(entity: Rocket) {
         entity.fuel = 1.0f;
-        entity.setPosition( (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 7f);
+        entity.setPosition((-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 7f);
     }
 
     fun getMap(): MapData {

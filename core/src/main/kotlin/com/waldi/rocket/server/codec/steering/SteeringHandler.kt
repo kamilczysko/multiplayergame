@@ -24,7 +24,6 @@ class SteeringHandler(private val gameWorld: GameWorld, private val gameServerSt
         } else {
             gameWorld.stopAccelerating(rocketId);
         }
-        println("angle: "+msg.angle)
         gameWorld.rotate(rocketId, msg.angle);
     }
 }

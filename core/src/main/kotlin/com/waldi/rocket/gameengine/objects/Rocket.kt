@@ -9,7 +9,7 @@ const val ROCKET_WIDTH = 0.5f;
 const val ROCKET_HEIGHT = 1.5f;
 const val THRUST_FORCE = 16f;
 
-private const val FUEL_CONSUMPTION = 0.0009f
+private const val FUEL_CONSUMPTION = 0.00095f
 
 class Rocket(val rocketId: String, val name: String, private var initXPos: Float, private var initYPos: Float) : WorldObject {
     var fuel: Float = 1.0f;
@@ -67,8 +67,7 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
         rocketBody.isFixedRotation = false;
 
         val rocketBodyFixture = rocketBody.createFixture(rocketFixtureDef);
-
-        rocketBodyFixture.userData = "ROCKET_$rocketId"
+        rocketBodyFixture.userData = rocketId;
 
         boxShape.dispose();
     }
