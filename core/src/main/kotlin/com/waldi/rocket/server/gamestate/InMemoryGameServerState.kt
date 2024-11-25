@@ -90,4 +90,9 @@ class InMemoryGameServerState: GameServerState {
         }
     }
 
+    override fun restartRocket(sessionId: String) {
+        val playerId = sessionIdToPlayer[sessionId]?.gameId ?: return;
+        gameController.resetRocket(playerId);
+    }
+
 }

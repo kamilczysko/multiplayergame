@@ -29,4 +29,8 @@ class GameController() {
        gameServerState.updateRocketsPositions(rocketData, timestamp);
     }
 
+    fun resetRocket(playerId: String) {
+        gameWorld.resetRocket(playerId);
+    }
+
 }

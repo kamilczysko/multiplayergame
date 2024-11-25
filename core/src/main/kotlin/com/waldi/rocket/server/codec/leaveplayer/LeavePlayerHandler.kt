@@ -14,10 +14,11 @@ class LeavePlayerHandler(val gameServerState: GameServerState): SimpleChannelInb
     }
 
     override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
-        logger.info { "Remove player..." }
         if(msg !is LeavePlayer) {
+            ctx?.fireChannelRead(msg);
             return;
         }
+        logger.info { "Remove player..." }
         if(ctx?.channel() != null) {
             logger.info { "Remove player ${ctx.channel().id().asShortText()}" }
             gameServerState.removePlayer(ctx.channel().id().asShortText());

@@ -15,4 +15,5 @@ interface GameServerState {
     fun setController(gameController: GameController);
     fun getMapData(): MapData?;
     fun updateRocketsPositions(rocketData: List<RocketData>, timestamp: Int)
+    fun restartRocket(sessionId: String)
 }

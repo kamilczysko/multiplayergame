@@ -7,7 +7,7 @@ import kotlin.math.log
 
 const val ROCKET_WIDTH = 0.5f;
 const val ROCKET_HEIGHT = 1.5f;
-const val THRUST_FORCE = 17f;
+const val THRUST_FORCE = 16f;
 
 private const val FUEL_CONSUMPTION = 0.0009f
 
@@ -75,6 +75,10 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
 
     override fun deleteFromWorld(world: World) {
         world.destroyBody(rocketBody);
+    }
+
+    fun setPosition(x: Float, y: Float) {
+        rocketBody.setTransform(Vector2(x, y),0f);
     }
 
     public var x: Float = initXPos

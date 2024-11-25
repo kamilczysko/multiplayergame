@@ -10,6 +10,7 @@ export class Connector {
         this.socket.onopen = () => {
             console.log("Connection opened...");
             this.socket?.send(joinFunction());
+            console.log("init socket")
             initSocket(this.socket!)
         }
 

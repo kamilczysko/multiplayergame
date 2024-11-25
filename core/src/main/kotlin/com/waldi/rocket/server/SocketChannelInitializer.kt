@@ -6,11 +6,9 @@ import com.waldi.rocket.server.codec.leaveplayer.LeavePlayerHandler
 import com.waldi.rocket.server.codec.mapdata.MapDataEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerHandler
-import com.waldi.rocket.server.codec.steering.SteerDecoder
+import com.waldi.rocket.server.codec.resetplayer.ResetPlayerHandler
 import com.waldi.rocket.server.codec.steering.SteeringHandler
-import com.waldi.rocket.server.codec.steering.SteeringMessage
 import com.waldi.rocket.server.gamestate.GameServerState
-import com.waldi.rocket.shared.GameController
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.http.HttpHeaderNames.WEBSOCKET_PROTOCOL
@@ -36,5 +34,6 @@ class SocketChannelInitializer(private val gameServerState: GameServerState, pri
         pipeline.addLast(SteeringHandler(gameWorld, gameServerState))
         pipeline.addLast(CreateNewPlayerHandler(gameServerState))
         pipeline.addLast(LeavePlayerHandler(gameServerState))
+        pipeline.addLast(ResetPlayerHandler(gameServerState))
     }
 }

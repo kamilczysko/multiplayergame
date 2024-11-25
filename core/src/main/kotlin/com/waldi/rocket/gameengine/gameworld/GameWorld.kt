@@ -65,12 +65,12 @@ class GameWorld {
                 .map { RocketData(it.x , it.y, it.angle, it.rocketId, it.fuel, it.points) }
                 .collect(Collectors.toList())
             if(rocket.isInMotion()) {
-//                logger.info("sending rocket data")
-//            executor.execute() {
+                logger.info("sending rocket data")
+            executor.execute() {
                 gameTimeStamp++;
                 gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
             }
-//            }
+            }
 
         }
 //        batch.end();
@@ -96,6 +96,11 @@ class GameWorld {
     fun removeRocket(rocketId: String) {
         rocketIdToEntity[rocketId]?.deleteFromWorld(world);
         rocketIdToEntity.remove(rocketId);
+    }
+
+    fun resetRocket(rocketId: String) {
+        rocketIdToEntity[rocketId]?.fuel = 1.0f;
+        rocketIdToEntity[rocketId]?.setPosition( (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 7f);
     }
 
     fun getMap(): MapData {
