@@ -18,7 +18,6 @@ const app = new PIXI.Application({
   antialias: true
 });
 
-app.stage.interactive = true;
 app.stage.eventMode = "static";
 app.stage.hitArea = app.screen;
 

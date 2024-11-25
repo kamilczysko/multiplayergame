@@ -163,7 +163,7 @@ function getCookieValue(key: string) {
     .map((sessionChunk) => sessionChunk.split("=")[1])[0];
 }
 
-function leaveGame(socket: WebSocket) {
+export function leaveGame() {
   const playerIdFromCookie = getCookieValue("playerId");
   if (!playerIdFromCookie) {
     return;
@@ -173,7 +173,7 @@ function leaveGame(socket: WebSocket) {
 
   buffer[0] = 0x03;
   buffer.set(playerId, 1);
-  socket.send(buffer);
+  socket?.send(buffer);
 
   setCookie("sessionId", "");
   setCookie("playerId", "");

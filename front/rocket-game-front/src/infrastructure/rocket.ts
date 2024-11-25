@@ -1,7 +1,5 @@
 import { Emitter, upgradeConfig } from "@pixi/particle-emitter";
-import { Container, Graphics, Sprite, Text, Texture, lights } from "pixi.js";
-import { Layer, Stage } from '@pixi/layers';
-import { diffuseGroup, normalGroup, lightGroup, PointLight } from '@pixi/lights';
+import { Container, Sprite, Text, Texture } from "pixi.js";
 import { getRocketSprite } from "../graphics/rockets-pool";
 
 export class Rocket {
@@ -13,8 +11,6 @@ export class Rocket {
   private fuelLabel: Text | undefined;
   private nameLabel: Text | undefined;
   private fire: Emitter | undefined;
-
-  private fireLight = new PointLight(0xffffff, 5);
 
   accelerating: boolean = false;
 
@@ -134,9 +130,6 @@ export class Rocket {
     this.fire?.update(this.accelerating && this.rocketStatus[0]?.fuel > 0 ? 0.03 : 0.005);
     this.fire?.updateSpawnPos(this.rocketSprite!.x, this.rocketSprite!.y - 1);
 
-    this.fireLight.x = this.rocketSprite!.x;
-    this.fireLight.y = this.rocketSprite!.y;
-
     if (!this.rocketSprite || this.rocketStatus.length == 0) {
       return;
     }
@@ -164,6 +157,7 @@ export class Rocket {
     this.fuelLabel!.y = this.rocketSprite!.y;
     this.fuelLabel!.rotation = this.rocketSprite!.rotation;
     this.fuelLabel!.text = `${recentStatus!.fuel}%`;
+
   }
 
   private interpolate(start: number, end: number, time: number) {

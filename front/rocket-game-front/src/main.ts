@@ -1,13 +1,12 @@
 import './style/style.css'
 import "./graphics/gameview.ts"
 import { Connector } from './connection/connection.ts';
-import { joinGameData } from './connection/controller.ts';
+import { joinGameData, leaveGame } from './connection/controller.ts';
 
 export let sendMessage: (buffer: ArrayBuffer) => void;
 
 if (getCookieValue("name")) {
-    const connector = new Connector(() => joinGameData(getCookieValue("name")));
-    sendMessage = (data: ArrayBuffer) => { connector.sendMessage(data) };
+    new Connector(() => joinGameData(getCookieValue("name")));
 }
 
 function getCookieValue(key: string) {
@@ -19,11 +18,11 @@ function getCookieValue(key: string) {
 
 document.getElementById("join")!.onclick = () => {
     const name: string = document.getElementById("playerName")!.value;
-    const connector = new Connector(() => joinGameData(name));
-    sendMessage = (data: ArrayBuffer) => { connector.sendMessage(data) };
+    new Connector(() => joinGameData(name));
 }
 
 document.getElementById("leave")!.onclick = () => {
+    leaveGame()
     setCookie("name", "");
     setCookie("sessionId", "");
     setCookie("playerId", "");
