@@ -7,7 +7,7 @@ let accelerateRocket: boolean = false;
 let interval: any;
 
 const container = new PIXI.Container();
-const containerIndicator = new PIXI.Container();
+const containerFrontal = new PIXI.Container();
 const containerFire = new PIXI.Container();
 const backgroundContainer = new PIXI.Container();
 
@@ -27,26 +27,48 @@ container.x = app.screen.width / 2;
 container.y = app.screen.height;
 container.scale.x *= -1;
 
-containerIndicator.x = app.screen.width / 2;
-containerIndicator.y = app.screen.height;
+containerFrontal.x = app.screen.width / 2;
+containerFrontal.y = app.screen.height;
 
 const background = PIXI.Texture.from('sky.jpg');
 const backogroundSprite = new PIXI.Sprite(background);
-
 backgroundContainer.scale.set(0.8)
 backgroundContainer.addChild(backogroundSprite);
+
+const cloud = PIXI.Texture.from('clouds1.png');
+const cloudSprite = new PIXI.Sprite(cloud);
+cloudSprite.scale.set(0.2);
+cloudSprite.x = -150;
+cloudSprite.y = 60;
+
+const cloud2 = PIXI.Texture.from('clouds2.png');
+const cloudSprite2 = new PIXI.Sprite(cloud2);
+cloudSprite2.scale.set(-0.2);
+cloudSprite2.x = 200;
+cloudSprite2.y = 220;
+
+const cloud3 = PIXI.Texture.from('clouds3.png');
+const cloudSprite3 = new PIXI.Sprite(cloud3);
+cloudSprite3.scale.set(-0.1);
+cloudSprite3.x = 30;
+cloudSprite3.y = 240;
+
+const cloud4 = PIXI.Texture.from('clouds5.png');
+const cloudSprite4 = new PIXI.Sprite(cloud4);
+cloudSprite4.scale.set(-0.1);
+cloudSprite4.x = 100;
+cloudSprite4.y = 300;
+
+containerFrontal.addChild(cloudSprite, cloudSprite2, cloudSprite3, cloudSprite4);
 
 containerFire.x = app.screen.width / 2;
 containerFire.y = app.screen.height;
 
-app.stage.addChild(backgroundContainer);
-app.stage.addChild(containerFire);
-app.stage.addChild(container);
-app.stage.addChild(containerIndicator);
+app.stage.addChild(backgroundContainer, containerFire, container, containerFrontal);
 
 let scale = -10;
 container.scale.set(scale)
-containerIndicator.scale.set(scale)
+containerFrontal.scale.set(scale)
 containerFire.scale.set(scale)
 
 let moonX = 0;
@@ -64,21 +86,21 @@ app.ticker.add((delta) => {
     myRocket.accelerating = accelerateRocket;
     myRocket.animate(1);
 
-    scale = lerp(scale, -35, 0.1);
+    scale = lerp(scale, -38, 0.1);
     container.scale.set(scale);
     container.scale.x *= -1;
     container.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * container.scale.x;
     container.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * container.scale.y;
 
-    containerIndicator.scale.set(scale);
-    containerIndicator.scale.x *= -1;
-    containerIndicator.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x;
-    containerIndicator.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y;
+    containerFrontal.scale.set(scale);
+    containerFrontal.scale.x *= -1;
+    containerFrontal.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerFrontal.scale.x;
+    containerFrontal.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerFrontal.scale.y;
 
     containerFire.scale.set(scale);
     containerFire.scale.x *= -1;
-    containerFire.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerIndicator.scale.x;
-    containerFire.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerIndicator.scale.y;
+    containerFire.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerFrontal.scale.x;
+    containerFire.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerFrontal.scale.y;
 
     backgroundContainer.x = myRocket.getRocketAcutalPosition().x - 100;
     backgroundContainer.y = (myRocket.getRocketAcutalPosition().y - 500) * 1.1;
@@ -86,14 +108,14 @@ app.ticker.add((delta) => {
     if (moonIndicator == null) {
       moonIndicator = new PIXI.Graphics();
       moonIndicator.beginFill(0x000000);
-      moonIndicator.lineStyle(0.2, 0x000000);
-      moonIndicator.moveTo(0, 0.001);
-      moonIndicator.lineTo(-0.001, 0);
-      moonIndicator.lineTo(0.001, 0);
+      moonIndicator.lineStyle(0.3, 0x000000);
+      moonIndicator.moveTo(0, 0.003);
+      moonIndicator.lineTo(-0.003, 0);
+      moonIndicator.lineTo(0.003, 0);
       moonIndicator.closePath();
       moonIndicator.endFill();
 
-      containerIndicator.addChild(moonIndicator);
+      containerFrontal.addChild(moonIndicator);
     }
 
     if (moonIndicator != null) {
@@ -146,7 +168,7 @@ app.stage.on("pointermove", (event) => {
 export function drawLevel(level: Level) {
   moonX = level.moonX;
   moonY = level.moonY;
-  level.drawLevel(containerIndicator);
+  level.drawLevel(containerFrontal);
 }
 
 function lerp(start: number, end: number, amt: number) {
@@ -177,7 +199,7 @@ export function zoomOut() {
   containerFire.x = app.screen.width / 2;
   containerFire.y = app.screen.height;
 
-  containerIndicator.scale.set(-10)
-  containerIndicator.x = app.screen.width / 2;
-  containerIndicator.y = app.screen.height;
+  containerFrontal.scale.set(-10)
+  containerFrontal.x = app.screen.width / 2;
+  containerFrontal.y = app.screen.height;
 }

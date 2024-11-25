@@ -22,7 +22,6 @@ class GameContactListener(val scorePoint: (rocketId: String) -> Unit):ContactLis
         }
 
         if(rocketId != null ) {
-            logger.info("HAS CONTACT")
             candidatesToScore[rocketId] = TimeUtils.millis();
         }
 

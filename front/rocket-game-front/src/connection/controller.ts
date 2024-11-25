@@ -98,7 +98,7 @@ function decodeMapInfo(bytes: ArrayBuffer) {
 
   const moon = {
     x: dataView.getInt8(1),
-    y: dataView.getUint8(2) + 140, //little secret with backend
+    y: dataView.getUint8(2) + 300, //little secret with backend
     radius: dataView.getUint8(3),
   };
   newLevel.setMoon(moon.x, moon.y, moon.radius);
