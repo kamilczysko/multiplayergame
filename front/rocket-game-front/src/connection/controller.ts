@@ -1,4 +1,4 @@
-import { addRocketToView, drawLevel } from "../graphics/gameview";
+import { addRocketToView, drawLevel, removeRocket, zoomOut } from "../graphics/gameview";
 import { Level } from "../infrastructure/level";
 import { Rocket } from "../infrastructure/rocket";
 
@@ -86,6 +86,7 @@ function decodePlayerLeave(bytes: ArrayBuffer) {
       new Uint8Array(buffer, mark, 5)
     );
     mark += 5;
+    removeRocket(playerId);
   }
 }
 
@@ -177,6 +178,7 @@ export function leaveGame() {
 
   setCookie("sessionId", "");
   setCookie("playerId", "");
+  zoomOut();
 }
 
 let socket: WebSocket;

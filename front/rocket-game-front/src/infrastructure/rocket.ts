@@ -176,4 +176,9 @@ export class Rocket {
     rocketContainer.addChild(this.fuelLabel!, this.nameLabel!, this.rocketSprite!)
     this.initFire(otherContainer);
   }
+
+  destroyRocket(container: Container) {
+    container.removeChild(this.fuelLabel!, this.nameLabel!, this.rocketSprite!)
+    this.fire?.destroy();
+  }
 }

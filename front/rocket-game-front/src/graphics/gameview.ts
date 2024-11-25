@@ -162,3 +162,22 @@ function getCookieValue(key: string): string {
 export function addRocketToView(rocket: Rocket) {
   rocket.addToContainer(container, containerFire);
 }
+
+export function removeRocket(rocketId: string) {
+  rockets[rocketId].destroyRocket(container);
+  delete rockets[rocketId];
+}
+
+export function zoomOut() {
+  container.scale.set(-10)
+  container.x = app.screen.width / 2;
+  container.y = app.screen.height;
+
+  containerFire.scale.set(-10)
+  containerFire.x = app.screen.width / 2;
+  containerFire.y = app.screen.height;
+
+  containerIndicator.scale.set(-10)
+  containerIndicator.x = app.screen.width / 2;
+  containerIndicator.y = app.screen.height;
+}
