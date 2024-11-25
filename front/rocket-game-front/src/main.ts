@@ -1,7 +1,7 @@
 import './style/style.css'
 import "./graphics/gameview.ts"
 import { Connector } from './connection/connection.ts';
-import { joinGameData, leaveGame } from './connection/controller.ts';
+import { joinGameData, leaveGame, resetRocket } from './connection/controller.ts';
 
 export let sendMessage: (buffer: ArrayBuffer) => void;
 
@@ -26,6 +26,10 @@ document.getElementById("leave")!.onclick = () => {
     setCookie("name", "");
     setCookie("sessionId", "");
     setCookie("playerId", "");
+}
+
+document.getElementById("reset")!.onclick = () => {
+    resetRocket();
 }
 
 function setCookie(value: string, key: string) {

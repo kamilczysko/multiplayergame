@@ -212,3 +212,9 @@ export function joinGameData(name: string): Uint8Array {
 
   return buffer;
 }
+
+export function resetRocket() {
+  const buffer = new Uint8Array(1);
+  buffer[0] = 0x07;
+  socket?.send(buffer);
+}
