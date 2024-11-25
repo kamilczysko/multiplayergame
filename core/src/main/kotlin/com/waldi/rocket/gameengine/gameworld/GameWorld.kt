@@ -72,6 +72,10 @@ class GameWorld {
             }
             }
 
+            if(rocket.y < -500) {
+                resetRocket(rocket)
+            }
+
         }
 //        batch.end();
 
@@ -99,8 +103,12 @@ class GameWorld {
     }
 
     fun resetRocket(rocketId: String) {
-        rocketIdToEntity[rocketId]?.fuel = 1.0f;
-        rocketIdToEntity[rocketId]?.setPosition( (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 7f);
+        resetRocket(rocketIdToEntity[rocketId]!!);
+    }
+
+    fun resetRocket(entity: Rocket) {
+        entity.fuel = 1.0f;
+        entity.setPosition( (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 7f);
     }
 
     fun getMap(): MapData {

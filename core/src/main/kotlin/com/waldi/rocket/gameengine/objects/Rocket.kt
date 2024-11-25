@@ -58,11 +58,11 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
 
         rocketFixtureDef = FixtureDef();
         rocketFixtureDef.shape = boxShape;
-        rocketFixtureDef.restitution = .2f;
-        rocketFixtureDef.density = .4f;
+        rocketFixtureDef.restitution = .35f;
+        rocketFixtureDef.density = .35f;
         rocketFixtureDef.friction = .95f;
 
-        rocketBody.angularDamping = .7f;
+        rocketBody.angularDamping = .85f;
 
         rocketBody.isFixedRotation = false;
 
@@ -78,6 +78,7 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
     }
 
     fun setPosition(x: Float, y: Float) {
+        rocketBody.setLinearVelocity(0f, 0f);
         rocketBody.setTransform(Vector2(x, y),0f);
     }
 
