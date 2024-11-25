@@ -82,7 +82,8 @@ class GameWorld {
     }
 
     private fun scorePoint(rocketId: String) {
-        rocketIdToEntity[rocketId]?.addPoint() ?: return;
+        logger.info("ADD POINTTT")
+        rocketIdToEntity[rocketId]?.addPoint()
         resetRocket(rocketId);
     }
 
@@ -122,7 +123,7 @@ class GameWorld {
             .map { PlatformData(it.x - it.width, it.y - it.height, it.width * 2, it.height * 2) }
             .toList();
 
-        val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y);
+        val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y - 70); //little secret with front
 
         return MapData(platformsData, moonData, mapHash);
     }
