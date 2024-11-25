@@ -68,7 +68,7 @@ export class Rocket {
       upgradeConfig(
         {
           "alpha": {
-            "start": 0.45,
+            "start": 0.7,
             "end": 1
           },
           "scale": {
@@ -91,8 +91,8 @@ export class Rocket {
           },
           "maxSpeed": 0,
           "startRotation": {
-            "min": 0,
-            "max": 360
+            "min": 180,
+            "max": 270
           },
           "noRotation": false,
           "rotationSpeed": {
@@ -100,8 +100,8 @@ export class Rocket {
             "max": 7
           },
           "lifetime": {
-            "min": 0.3,
-            "max": 0.6
+            "min": 0.4,
+            "max": 0.85
           },
           "blendMode": "screen",
           "frequency": 0.001,
@@ -128,7 +128,7 @@ export class Rocket {
 
   animate(delta: number) {
     this.fire?.update(this.accelerating && this.rocketStatus[0]?.fuel > 0 ? 0.03 : 0.005);
-    this.fire?.updateSpawnPos(this.rocketSprite!.x, this.rocketSprite!.y - 1);
+    this.fire?.updateSpawnPos(this.rocketSprite!.x + 1.2 * Math.sin(this.rocketSprite!.rotation), this.rocketSprite!.y - 1.2 * Math.cos(this.rocketSprite!.rotation));
 
     if (!this.rocketSprite || this.rocketStatus.length == 0) {
       return;

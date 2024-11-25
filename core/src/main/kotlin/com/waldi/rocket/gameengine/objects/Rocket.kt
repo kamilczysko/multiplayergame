@@ -58,7 +58,7 @@ class Rocket(val rocketId: String, val name: String, private var initXPos: Float
 
         rocketFixtureDef = FixtureDef();
         rocketFixtureDef.shape = boxShape;
-        rocketFixtureDef.restitution = .35f;
+        rocketFixtureDef.restitution = .3f;
         rocketFixtureDef.density = .35f;
         rocketFixtureDef.friction = .95f;
 
