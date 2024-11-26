@@ -18,13 +18,26 @@ function getCookieValue(key: string) {
 
 document.getElementById("join")!.onclick = () => {
     new Connector(() => joinGameData());
+    document.getElementById("join")!.style.display = "none"
+    document.getElementById("leave")!.style.display = "block"
+}
+
+if (getCookieValue("playerId")) {
+    document.getElementById("leave")!.style.display = "block"
+    document.getElementById("join")!.style.display = "none"
+} else {
+    document.getElementById("leave")!.style.display = "none"
+    document.getElementById("join")!.style.display = "block"
 }
 
 document.getElementById("leave")!.onclick = () => {
     leaveGame()
     setCookie("sessionId", "");
     setCookie("playerId", "");
+    document.getElementById("join")!.style.display = "block"
+    document.getElementById("leave")!.style.display = "none"
 }
+
 
 document.getElementById("reset")!.onclick = () => {
     resetRocket();
