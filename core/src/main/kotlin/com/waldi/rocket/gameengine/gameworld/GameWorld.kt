@@ -70,7 +70,7 @@ class GameWorld {
                     gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
                 }
             }
-            if (rocket.y < -500) {
+            if (rocket.y < -300) {
                 resetRocket(rocket)
             }
         }
