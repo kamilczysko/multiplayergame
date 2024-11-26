@@ -7,7 +7,6 @@ type playerData = {
   points: number;
 };
 
-export const players: Record<string, playerData> = {};
 export const rockets: Record<string, Rocket> = {};
 
 export async function readMessage(data: Blob) {
@@ -48,14 +47,9 @@ function decodeNewUser(bytes: ArrayBuffer) {
   const playerIdIdBytes = new Uint8Array(buffer, 2 + sessionIdLength, 5);
   const playerId = new TextDecoder("utf-8").decode(playerIdIdBytes);
 
-  const nameBytes = new Uint8Array(buffer, 2 + sessionIdLength + 5);
-  const name = new TextDecoder("utf-8").decode(nameBytes);
 
-  document.cookie = `name=${name};`;
   document.cookie = `sessionId=${sessionId};`;
   document.cookie = `playerId=${playerId};`;
-
-  players[playerId] = { playerName: name, points: 0 };
 }
 
 function decodePlayersList(bytes: ArrayBuffer) {
@@ -73,7 +67,6 @@ function decodePlayersList(bytes: ArrayBuffer) {
       new Uint8Array(buffer, mark, 5)
     );
     mark += 5; //5 is equal to playerId.length
-    players[playerId] = { playerName: name, points: 0 };
   }
 }
 

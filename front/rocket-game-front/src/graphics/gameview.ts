@@ -94,17 +94,15 @@ app.ticker.add((delta) => {
     container.scale.set(scale);
     container.scale.x *= -1;
     container.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * container.scale.x;
-    container.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * container.scale.y;
-
+    container.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * container.scale.y * 0.97;
     containerFrontal.scale.set(scale);
     containerFrontal.scale.x *= -1;
     containerFrontal.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerFrontal.scale.x;
-    containerFrontal.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerFrontal.scale.y;
-
+    containerFrontal.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerFrontal.scale.y * 0.97;
     containerFire.scale.set(scale);
     containerFire.scale.x *= -1;
     containerFire.x = app.renderer.width / 2 - myRocket.getRocketAcutalPosition().x * containerFrontal.scale.x;
-    containerFire.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerFrontal.scale.y;
+    containerFire.y = app.renderer.height / 1.4 - myRocket.getRocketAcutalPosition().y * containerFrontal.scale.y * 0.97;
 
     backgroundContainer.x = myRocket.getRocketAcutalPosition().x - 100;
     backgroundContainer.y = (myRocket.getRocketAcutalPosition().y - 500) * 1.1;
