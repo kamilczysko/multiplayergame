@@ -195,6 +195,8 @@ export function joinGameData(): Uint8Array {
   const existingSessionCookieBytes = textEncoder.encode(getCookieValue("sessionId"));
   const playerId = textEncoder.encode(getCookieValue("playerId"))
 
+  console.log(getCookieValue("playerId") + " - " + getCookieValue("sessionId"))
+
   const buffer = new Uint8Array(1 + existingSessionCookieBytes.length + 5);
   buffer[0] = 0x01;
   buffer.set(playerId, 1)
