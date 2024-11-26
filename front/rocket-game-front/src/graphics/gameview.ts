@@ -23,9 +23,12 @@ app.stage.hitArea = app.screen;
 
 document.getElementById("gameplay")!.appendChild(app.view);
 
+let scale = -10;
+
 container.x = app.screen.width / 2;
 container.y = app.screen.height;
 container.scale.x *= -1;
+container.scale.set(scale)
 
 containerFrontal.x = app.screen.width / 2;
 containerFrontal.y = app.screen.height;
@@ -66,8 +69,7 @@ containerFire.y = app.screen.height;
 
 app.stage.addChild(backgroundContainer, containerFire, container, containerFrontal);
 
-let scale = -10;
-container.scale.set(scale)
+
 containerFrontal.scale.set(scale)
 containerFire.scale.set(scale)
 
@@ -168,7 +170,7 @@ app.stage.on("pointermove", (event) => {
 export function drawLevel(level: Level) {
   moonX = level.moonX;
   moonY = level.moonY;
-  level.drawLevel(containerFrontal);
+  level.drawLevel(container);
 }
 
 function lerp(start: number, end: number, amt: number) {

@@ -26,7 +26,7 @@ export class Level {
         this.moonX = x;
         this.moonY = y;
 
-        this.moonLight = new PointLight(0x000000, 1, 500);
+        this.moonLight = new PointLight(0x000000, 1, 400);
     }
 
     addBlock(x: number, y: number, w: number, h: number) {
