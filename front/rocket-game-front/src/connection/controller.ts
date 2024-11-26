@@ -197,19 +197,15 @@ export function sendSteeringAction(angle: number, accelerate: boolean): Int8Arra
   return buffer;
 }
 
-export function joinGameData(name: string): Uint8Array {
+export function joinGameData(): Uint8Array {
   const textEncoder = new TextEncoder();
   const existingSessionCookieBytes = textEncoder.encode(getCookieValue("sessionId"));
   const playerId = textEncoder.encode(getCookieValue("playerId"))
-  const nameBytes = textEncoder.encode(name);
 
-  const buffer = new Uint8Array(nameBytes.length + 2 + existingSessionCookieBytes.length + 5);
+  const buffer = new Uint8Array(1 + existingSessionCookieBytes.length + 5);
   buffer[0] = 0x01;
-  buffer[1] = nameBytes.length;
-  buffer.set(nameBytes, 2);
-  buffer.set(playerId, nameBytes.length + 2)
-  buffer.set(existingSessionCookieBytes, nameBytes.length + 2 + 5)
-
+  buffer.set(playerId, 1)
+  buffer.set(existingSessionCookieBytes, 6)
   return buffer;
 }
 

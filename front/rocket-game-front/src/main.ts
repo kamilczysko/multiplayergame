@@ -5,8 +5,8 @@ import { joinGameData, leaveGame, resetRocket } from './connection/controller.ts
 
 export let sendMessage: (buffer: ArrayBuffer) => void;
 
-if (getCookieValue("name")) {
-    new Connector(() => joinGameData(getCookieValue("name")));
+if (getCookieValue("playerId")) {
+    new Connector(() => joinGameData());
 }
 
 function getCookieValue(key: string) {
@@ -17,12 +17,11 @@ function getCookieValue(key: string) {
 }
 
 document.getElementById("join")!.onclick = () => {
-    new Connector(() => joinGameData("andrzej"));//todo remove names
+    new Connector(() => joinGameData());
 }
 
 document.getElementById("leave")!.onclick = () => {
     leaveGame()
-    setCookie("name", "");
     setCookie("sessionId", "");
     setCookie("playerId", "");
 }
