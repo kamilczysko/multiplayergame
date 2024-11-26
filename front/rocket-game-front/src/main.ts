@@ -17,8 +17,7 @@ function getCookieValue(key: string) {
 }
 
 document.getElementById("join")!.onclick = () => {
-    const name: string = document.getElementById("playerName")!.value;
-    new Connector(() => joinGameData(name));
+    new Connector(() => joinGameData("andrzej"));//todo remove names
 }
 
 document.getElementById("leave")!.onclick = () => {

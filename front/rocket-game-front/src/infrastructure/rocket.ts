@@ -3,25 +3,23 @@ import { Container, Sprite, Text, Texture } from "pixi.js";
 import { getRocketSprite } from "../graphics/rockets-pool";
 
 export class Rocket {
-  private rocketStatus: { x: number; y: number; angle: number, fuel: number }[] = [];
-  private name: string;
+  private rocketStatus: { x: number; y: number; angle: number, fuel: number, points: number }[] = [];
   rocketId: string;
 
   private rocketSprite: Sprite | undefined;
   private fuelLabel: Text | undefined;
-  private nameLabel: Text | undefined;
+  private pointsLabel: Text | undefined;
   private fire: Emitter | undefined;
 
   accelerating: boolean = false;
 
-  constructor(x: number, y: number, angle: number, fuel: number, name: string, rocketId: string) {
-    this.rocketStatus = [{ x: x, y: y, angle: angle, fuel: fuel }];
+  constructor(x: number, y: number, angle: number, fuel: number, rocketId: string, points: number) {
+    this.rocketStatus = [{ x: x, y: y, angle: angle, fuel: fuel, points: points }];
     this.rocketId = rocketId;
-    this.name = name;
 
     this.initRocketSprite();
     this.initFuelLabel(fuel);
-    this.initNameLabel(name);
+    this.initNameLabel(points.toString());
   }
 
   private initRocketSprite() {
@@ -50,16 +48,16 @@ export class Rocket {
   }
 
   private initNameLabel(name: string) {
-    this.nameLabel = new Text(`${name}`, {
+    this.pointsLabel = new Text(`${name}`, {
       fontFamily: 'Roboto',
       fontSize: 16
     });
 
-    this.nameLabel.x = this.rocketStatus[0].x;
-    this.nameLabel.y = this.rocketStatus[0].y;
-    this.nameLabel.anchor.x = -1;
-    this.nameLabel.scale.set(-0.02);
-    this.nameLabel.scale.x *= -1;
+    this.pointsLabel.x = this.rocketStatus[0].x;
+    this.pointsLabel.y = this.rocketStatus[0].y;
+    this.pointsLabel.anchor.x = -2;
+    this.pointsLabel.scale.set(-0.03);
+    this.pointsLabel.scale.x *= -1;
   }
 
   private initFire(container: Container) {
@@ -119,11 +117,8 @@ export class Rocket {
     );
   }
 
-  addRocketState(x: number, y: number, angle: number, fuel: number) {
-    this.rocketStatus.push({ x: x, y: y, angle: angle, fuel: fuel });
-  }
-  setName(name: string) {
-    this.name = name;
+  addRocketState(x: number, y: number, angle: number, fuel: number, points: number) {
+    this.rocketStatus.push({ x: x, y: y, angle: angle, fuel: fuel, points: points });
   }
 
   animate(delta: number) {
@@ -149,15 +144,15 @@ export class Rocket {
     this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, recentStatus!.y, delta);
     this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
 
-    this.nameLabel!.x = this.rocketSprite!.x;
-    this.nameLabel!.y = this.rocketSprite!.y;
-    this.nameLabel!.rotation = this.rocketSprite!.rotation;
+    this.pointsLabel!.x = this.rocketSprite!.x;
+    this.pointsLabel!.y = this.rocketSprite!.y;
+    this.pointsLabel!.rotation = this.rocketSprite!.rotation;
+    this.pointsLabel!.text = recentStatus?.points + "";
 
     this.fuelLabel!.x = this.rocketSprite!.x;
     this.fuelLabel!.y = this.rocketSprite!.y;
     this.fuelLabel!.rotation = this.rocketSprite!.rotation;
     this.fuelLabel!.text = `${recentStatus!.fuel}%`;
-
   }
 
   private interpolate(start: number, end: number, time: number) {
@@ -173,12 +168,16 @@ export class Rocket {
   }
 
   addToContainer(rocketContainer: Container, otherContainer: Container) {
-    rocketContainer.addChild(this.fuelLabel!, this.nameLabel!, this.rocketSprite!)
+    rocketContainer.addChild(this.fuelLabel!, this.pointsLabel!, this.rocketSprite!)
     this.initFire(otherContainer);
   }
 
   destroyRocket(container: Container) {
-    container.removeChild(this.fuelLabel!, this.nameLabel!, this.rocketSprite!)
+    container.removeChild(this.fuelLabel!, this.pointsLabel!, this.rocketSprite!)
+    this.fuelLabel!.destroy({ children: true, texture: true, baseTexture: true })
+    this.pointsLabel!.destroy({ children: true, texture: true, baseTexture: true })
+    this.rocketSprite!.destroy({ children: true, texture: true, baseTexture: true })
     this.fire?.destroy();
+    this.fire?.cleanup();
   }
 }

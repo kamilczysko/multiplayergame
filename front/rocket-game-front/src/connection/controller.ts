@@ -145,10 +145,10 @@ function decodeRockets(bytes: ArrayBuffer) {
 
     const rocket: Rocket = rockets[playerId];
     if (!rocket) {
-      rockets[playerId] = new Rocket(x, y, angle, fuel, players[playerId]?.playerName, playerId);
+      rockets[playerId] = new Rocket(x, y, angle, fuel, playerId, points);
       addRocketToView(rockets[playerId]);
     } else {
-      rocket.addRocketState(x, y, angle, fuel);
+      rocket.addRocketState(x, y, angle, fuel, points);
     }
   }
 }

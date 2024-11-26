@@ -12,7 +12,9 @@ const containerFire = new PIXI.Container();
 const backgroundContainer = new PIXI.Container();
 
 const app = new PIXI.Application({
-  resizeTo: window,
+  resizeTo: document.getElementById("gameplay")!,
+  resolution: window.devicePixelRatio,
+  autoDensity: true,
   background: "#211753",
   forceCanvas: false,
   antialias: true
@@ -128,6 +130,12 @@ app.ticker.add((delta) => {
     }
   }
 
+  Object.values(rockets).forEach(rocket => {
+    if (rocket.rocketId != getCookieValue("playerId")) {
+      rocket.animate(1);
+    }
+  });
+
   if (progress == 1) {
     elapsedTime = 0;
   }
@@ -189,6 +197,7 @@ export function addRocketToView(rocket: Rocket) {
 
 export function removeRocket(rocketId: string) {
   rockets[rocketId].destroyRocket(container);
+  document.getElementById("score_" + rocketId)?.remove();
   delete rockets[rocketId];
 }
 
