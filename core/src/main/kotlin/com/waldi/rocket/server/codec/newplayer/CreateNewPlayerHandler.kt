@@ -23,11 +23,11 @@ class CreateNewPlayerHandler(private val gameServerState: GameServerState) : Sim
 
         val newPlayer: CreateNewPlayer = msg
         val oldSession = newPlayer.sessionId;
-        val freshPlayer = gameServerState.addOrUpdatePlayer(oldSession, newSessionId, newPlayer.name, channel);
+        val freshPlayer = gameServerState.addOrUpdatePlayer(oldSession, newSessionId, channel);
 
         logger.info { "Create new player or refresh session for $freshPlayer" }
 
-        ctx.writeAndFlush(CreateNewPlayer(freshPlayer.playerName, freshPlayer.gameId, freshPlayer.playerSessionId));
+        ctx.writeAndFlush(CreateNewPlayer(freshPlayer.gameId, freshPlayer.playerSessionId));
 
         logger.info { "Send map data to player ${freshPlayer.gameId}" }
 

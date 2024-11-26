@@ -87,9 +87,9 @@ class GameWorld {
         resetRocket(rocketId);
     }
 
-    fun initRocket(rocketName: String, rocketId: String) {
+    fun initRocket(rocketId: String) {
         val newRocket =
-            Rocket(rocketId, rocketName, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 5f);
+            Rocket(rocketId, (-BASE_PLATFORM_WIDTH..BASE_PLATFORM_WIDTH).random().toFloat(), 5f);
 
         assert(!rocketIdToEntity.contains(rocketId)) { "rocket $rocketId already exists in game" }
 

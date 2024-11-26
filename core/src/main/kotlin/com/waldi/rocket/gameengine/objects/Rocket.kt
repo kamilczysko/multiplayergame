@@ -11,7 +11,7 @@ const val THRUST_FORCE = 16f;
 
 private const val FUEL_CONSUMPTION = 0.00095f
 
-class Rocket(val rocketId: String, val name: String, private var initXPos: Float, private var initYPos: Float) : WorldObject {
+class Rocket(val rocketId: String, private var initXPos: Float, private var initYPos: Float) : WorldObject {
     var fuel: Float = 1.0f;
     var points: Short = 0;
     var isAccelerating = false;

@@ -6,7 +6,6 @@ import com.waldi.rocket.shared.MapData
 import com.waldi.rocket.shared.RocketData
 import io.netty.channel.Channel
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame
-import io.netty.util.ReferenceCountUtil
 import mu.two.KotlinLogging
 import java.util.concurrent.ConcurrentHashMap
 
@@ -42,26 +41,25 @@ class InMemoryGameServerState: GameServerState {
             .findAny().orElseGet { null };
     }
 
-    override fun addOrUpdatePlayer(oldSessionId: String, newSessionId: String, name: String, channel: Channel): Player {
+    override fun addOrUpdatePlayer(oldSessionId: String, newSessionId: String, channel: Channel): Player {
         logger.info { "Players list before add new: ${sessionIdToPlayer.keys}" }
         if(oldSessionId.isBlank() || !sessionIdToPlayer.containsKey(oldSessionId)) {
-            return createNewPlayer(name, newSessionId, channel)
+            return createNewPlayer(newSessionId, channel)
         }
-        return refreshSessionForPlayer(oldSessionId, name, channel, newSessionId)
+        return refreshSessionForPlayer(oldSessionId, channel, newSessionId)
     }
 
-    private fun createNewPlayer(name: String, newSessionId: String, channel: Channel): Player {
-        val newPlayer = Player(name, newSessionId, channel);
+    private fun createNewPlayer(newSessionId: String, channel: Channel): Player {
+        val newPlayer = Player(newSessionId, channel);
         sessionIdToPlayer[newSessionId] = newPlayer;
 
-        gameController.initRocket(newPlayer.playerName, newPlayer.gameId); //name is unnecessary, todo remove later
+        gameController.initRocket(newPlayer.gameId); //name is unnecessary, todo remove later
 
         return newPlayer;
     }
 
-    private fun refreshSessionForPlayer(oldSessionId: String, name: String, channel: Channel, newSessionId: String): Player {
+    private fun refreshSessionForPlayer(oldSessionId: String, channel: Channel, newSessionId: String): Player {
         val player = sessionIdToPlayer[oldSessionId]!!
-        player.playerName = name;
         player.playerChannel = channel;
         player.playerSessionId = newSessionId;
         sessionIdToPlayer[newSessionId] = player;

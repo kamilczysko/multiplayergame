@@ -3,14 +3,10 @@ package com.waldi.rocket.server.gamestate
 import io.netty.channel.Channel
 import java.util.UUID
 
-class Player(private var name: String, private var sessionId: String, private var channel: Channel) {
+class Player(private var sessionId: String, private var channel: Channel) {
     val gameId: String = UUID.randomUUID().mostSignificantBits.toString().replace("-", "").take(5)
     private var points: Int = 0;
     private var fuel: Float = 1.0f;
-
-    var playerName: String
-        get() = this.name;
-        set(newName) { this.name = newName; }
 
     var playerSessionId: String
         get() = this.sessionId;
@@ -37,6 +33,6 @@ class Player(private var name: String, private var sessionId: String, private va
     }
 
     override fun toString(): String {
-        return "Player(name='$name', sessionId='$sessionId', gameId='$gameId')"
+        return "Player(sessionId='$sessionId', gameId='$gameId')"
     }
 }

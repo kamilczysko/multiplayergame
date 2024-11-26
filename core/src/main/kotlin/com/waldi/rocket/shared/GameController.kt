@@ -13,8 +13,8 @@ class GameController() {
         this.gameServerState.setController(this);
     }
 
-    fun initRocket(rocketName: String, rocketId: String) {
-        gameWorld.initRocket(rocketName, rocketId)
+    fun initRocket(rocketId: String) {
+        gameWorld.initRocket(rocketId)
     }
 
     fun removeRocket(rocketId: String) {
