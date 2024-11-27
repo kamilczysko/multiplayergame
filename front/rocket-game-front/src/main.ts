@@ -9,6 +9,7 @@ if (getCookieValue("playerId")) {
     new Connector(() => joinGameData());
 }
 
+
 function getCookieValue(key: string) {
     return document.cookie
         .split(";")
@@ -36,6 +37,7 @@ document.getElementById("leave")!.onclick = () => {
     setCookie("playerId", "");
     document.getElementById("join")!.style.display = "block"
     document.getElementById("leave")!.style.display = "none"
+    window.location.reload();
 }
 
 

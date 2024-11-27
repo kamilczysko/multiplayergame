@@ -30,7 +30,7 @@ class GameController() {
     }
 
     fun resetRocket(playerId: String) {
-        gameWorld.resetRocket(playerId);
+        gameWorld.resetRocketById(playerId);
     }
 
 }

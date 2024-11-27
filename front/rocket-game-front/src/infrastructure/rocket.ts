@@ -177,7 +177,8 @@ export class Rocket {
     this.fuelLabel!.destroy({ children: true, texture: true, baseTexture: true })
     this.pointsLabel!.destroy({ children: true, texture: true, baseTexture: true })
     this.rocketSprite!.destroy({ children: true, texture: true, baseTexture: true })
-    this.fire?.destroy();
+    this.fire!.emit = false;
     this.fire?.cleanup();
+    this.fire?.destroy();
   }
 }

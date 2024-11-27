@@ -61,19 +61,20 @@ class GameWorld {
             if (rocket.isAccelerating) {
                 rocket.accelerate();
             }
-            val rocketsData = rocketIdToEntity.values.stream()
-                .map { RocketData(it.x, it.y, it.angle, it.rocketId, it.fuel, it.points) }
-                .collect(Collectors.toList())
-            if (rocket.isInMotion()) {
-                executor.execute() {
-                    gameTimeStamp++;
-                    gameController.notifyAboutGameState(rocketsData, gameTimeStamp);
-                }
-            }
+
             if (rocket.y < -300) {
                 resetRocket(rocket)
             }
         }
+
+        val rocketsData = rocketIdToEntity.values.stream()
+            .map { RocketData(it.x, it.y, it.angle, it.rocketId, it.fuel, it.points) }
+            .collect(Collectors.toList())
+        executor.execute() {
+            gameTimeStamp++;
+            gameController.notifyAboutGameState(rocketsData, gameTimeStamp); //todo batching!!!
+        }
+
         gameContactListener.update();
 //        batch.end();
 
@@ -84,7 +85,7 @@ class GameWorld {
     private fun scorePoint(rocketId: String) {
         logger.info("ADD POINTTT")
         rocketIdToEntity[rocketId]?.addPoint()
-        resetRocket(rocketId);
+        resetRocketById(rocketId);
     }
 
     fun initRocket(rocketId: String) {
@@ -102,7 +103,7 @@ class GameWorld {
         rocketIdToEntity.remove(rocketId);
     }
 
-    fun resetRocket(rocketId: String) {
+    fun resetRocketById(rocketId: String) {
         resetRocket(rocketIdToEntity[rocketId]!!);
     }
 
@@ -143,6 +144,13 @@ class GameWorld {
         mapHash = UUID.randomUUID().mostSignificantBits.toString().replace("-", "").take(5);
 
         return getMap();
+    }
+
+    fun deleteMap() {
+        this.platforms.forEach { it.deleteFromWorld(world) }
+        this.moon?.deleteFromWorld(world);
+        this.moon = null;
+        this.platforms = emptyList();
     }
 
     fun startAccelerating(rocketId: String) {
