@@ -1,4 +1,4 @@
-import { initSocket, readMessage } from "./controller";
+import { initSocket, leaveGame, readMessage } from "./controller";
 
 export class Connector {
 
@@ -16,6 +16,10 @@ export class Connector {
 
         this.socket.onmessage = (msg: MessageEvent) => {
             readMessage(msg.data)
+        }
+
+        this.socket.onclose = () => {
+            leaveGame();
         }
     }
 

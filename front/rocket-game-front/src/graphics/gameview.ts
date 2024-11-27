@@ -129,8 +129,8 @@ app.ticker.add((delta) => {
   }
 
   Object.values(rockets).forEach(rocket => {
-    if (rocket.rocketId != getCookieValue("playerId")) {
-      rocket.animate(1);
+    if (rocket?.rocketId != getCookieValue("playerId")) {
+      rocket?.animate(1);
     }
   });
 
@@ -173,6 +173,7 @@ app.stage.on("pointermove", (event) => {
   angle = (Math.atan2(deltaX, deltaY) / Math.PI) * 100;
 });
 
+
 export function drawLevel(level: Level) {
   moonX = level.moonX;
   moonY = level.moonY;
@@ -197,6 +198,7 @@ export function removeRocket(rocketId: string) {
   rockets[rocketId].destroyRocket(container);
   document.getElementById("score_" + rocketId)?.remove();
   delete rockets[rocketId];
+  app.renderer.render(app.stage);
 }
 
 export function zoomOut() {

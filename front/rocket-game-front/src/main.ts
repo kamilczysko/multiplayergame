@@ -9,6 +9,7 @@ if (getCookieValue("playerId")) {
     new Connector(() => joinGameData());
 }
 
+
 function getCookieValue(key: string) {
     return document.cookie
         .split(";")

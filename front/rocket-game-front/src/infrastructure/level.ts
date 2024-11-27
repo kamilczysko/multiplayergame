@@ -4,7 +4,7 @@ import { Container, Graphics, Sprite, Texture } from "pixi.js"
 export class Level {
     private graphic = new Graphics();
     private block = this.graphic;
-    private moonLight: PointLight | null = null;
+    private: PointLight | null = null;
     private image: Sprite | null = null;
     private moon = this.graphic;
     moonX = 0;
@@ -26,7 +26,6 @@ export class Level {
         this.moonX = x;
         this.moonY = y;
 
-        this.moonLight = new PointLight(0x000000, 1, 400);
     }
 
     addBlock(x: number, y: number, w: number, h: number) {
@@ -41,7 +40,6 @@ export class Level {
         container.addChild(this.moon!);
         container.addChild(this.image!);
         container.addChild(this.block!);
-        container.addChild(this.moonLight!);
     }
 
 }
