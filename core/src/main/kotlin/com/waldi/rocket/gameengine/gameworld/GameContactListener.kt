@@ -10,7 +10,7 @@ import mu.two.KotlinLogging
 class GameContactListener(val scorePoint: (rocketId: String) -> Unit):ContactListener {
 
     private val candidatesToScore: HashMap<String, Long> = HashMap();
-    private val TIME_TO_SCORE_IN_SECONDS = 5f;
+    private val TIME_TO_SCORE_IN_SECONDS = 1f;
     private val logger = KotlinLogging.logger {}
 
     override fun beginContact(p0: Contact?) {
