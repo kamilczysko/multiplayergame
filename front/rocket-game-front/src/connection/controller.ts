@@ -185,7 +185,8 @@ export function sendSteeringAction(angle: number, accelerate: boolean): Int8Arra
   return buffer;
 }
 
-export function joinGameData(): Uint8Array {
+export function joinNewGameSession(): Uint8Array {
+  console.log("JOIN GAME SESSION")
   const textEncoder = new TextEncoder();
   const existingSessionCookieBytes = textEncoder.encode(getCookieValue("sessionId"));
   const playerId = textEncoder.encode(getCookieValue("playerId"))
@@ -197,8 +198,14 @@ export function joinGameData(): Uint8Array {
   return buffer;
 }
 
+export function joinGame() {
+  console.log("join game")
+  const buffer = new Uint8Array(1);
+  buffer[0] = 0x00;
+  return buffer;
+}
+
 export function resetRocket() {
-  console.log("reset")
   const buffer = new Uint8Array(1);
   buffer[0] = 0x07;
   socket!.send(buffer);

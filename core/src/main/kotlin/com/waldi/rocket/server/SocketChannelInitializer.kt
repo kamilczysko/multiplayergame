@@ -6,6 +6,8 @@ import com.waldi.rocket.server.codec.leaveplayer.LeavePlayerHandler
 import com.waldi.rocket.server.codec.mapdata.MapDataEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerEncoder
 import com.waldi.rocket.server.codec.newplayer.CreateNewPlayerHandler
+import com.waldi.rocket.server.codec.resetplayer.JoinGameDecoder
+import com.waldi.rocket.server.codec.resetplayer.JoinGameHandler
 import com.waldi.rocket.server.codec.resetplayer.ResetPlayerHandler
 import com.waldi.rocket.server.codec.steering.SteeringHandler
 import com.waldi.rocket.server.gamestate.GameServerState
@@ -31,6 +33,7 @@ class SocketChannelInitializer(private val gameServerState: GameServerState, pri
         pipeline.addLast(GameDecoder())
         pipeline.addLast(CreateNewPlayerEncoder())
         pipeline.addLast(MapDataEncoder())
+        pipeline.addLast((JoinGameHandler(gameServerState)))
         pipeline.addLast(SteeringHandler(gameWorld, gameServerState))
         pipeline.addLast(CreateNewPlayerHandler(gameServerState))
         pipeline.addLast(LeavePlayerHandler(gameServerState))

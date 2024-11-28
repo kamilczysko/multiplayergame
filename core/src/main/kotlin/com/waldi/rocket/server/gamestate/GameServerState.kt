@@ -10,7 +10,9 @@ interface GameServerState {
     fun hasSession(sessionId: String): Boolean;
     fun getPlayerBySessionId(sessionId: String): Player?;
     fun getPlayerByGameId(gameId: String): Player?;
-    fun addOrUpdatePlayer(oldSessionId: String, newSessionId: String, channel: Channel): Player;
+    fun initNewPlayer(sessionId: String, channel: Channel):Player;
+    fun refreshPlayer(oldSessionId: String, newSessionId: String, channel: Channel): Player;
+    fun joinGame(sessionId: String);
     fun removePlayer(sessionId: String);
     fun setController(gameController: GameController);
     fun getMapData(): MapData?;

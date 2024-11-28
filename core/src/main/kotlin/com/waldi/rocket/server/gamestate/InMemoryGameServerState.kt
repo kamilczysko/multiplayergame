@@ -41,20 +41,27 @@ class InMemoryGameServerState: GameServerState {
             .findAny().orElseGet { null };
     }
 
-    override fun addOrUpdatePlayer(oldSessionId: String, newSessionId: String, channel: Channel): Player {
+    override fun refreshPlayer(oldSessionId: String, newSessionId: String, channel: Channel): Player {
         logger.info { "Players list before add new: ${sessionIdToPlayer.keys}" }
         if(oldSessionId.isBlank() || !sessionIdToPlayer.containsKey(oldSessionId)) {
-            return createNewPlayer(newSessionId, channel)
+            return initNewPlayer(newSessionId, channel)
         }
         return refreshSessionForPlayer(oldSessionId, channel, newSessionId)
     }
 
-    private fun createNewPlayer(newSessionId: String, channel: Channel): Player {
-        val newPlayer = Player(newSessionId, channel);
-        sessionIdToPlayer[newSessionId] = newPlayer;
+    override fun joinGame(sessionId: String) {
+        val player = sessionIdToPlayer[sessionId];
+        logger.info("JOIN GAME: "+player);
+        if(player == null) {
+            logger.info("Player does not exists")
+            return;
+        }
+        gameController.initRocket(player.gameId);
+    }
 
-        gameController.initRocket(newPlayer.gameId); //name is unnecessary, todo remove later
-
+    override fun initNewPlayer(sessionId: String, channel: Channel): Player {
+        val newPlayer = Player(sessionId, channel);
+        sessionIdToPlayer[sessionId] = newPlayer;
         return newPlayer;
     }
 

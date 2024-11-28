@@ -1,13 +1,12 @@
 import './style/style.css'
 import "./graphics/gameview.ts"
 import { Connector } from './connection/connection.ts';
-import { joinGameData, leaveGame, resetRocket } from './connection/controller.ts';
+import { joinGame, joinNewGameSession, leaveGame, resetRocket } from './connection/controller.ts';
 
 export let sendMessage: (buffer: ArrayBuffer) => void;
 
-if (getCookieValue("playerId")) {
-    new Connector(() => joinGameData());
-}
+
+const connection = new Connector(() => joinNewGameSession());
 
 
 function getCookieValue(key: string) {
@@ -18,18 +17,18 @@ function getCookieValue(key: string) {
 }
 
 document.getElementById("join")!.onclick = () => {
-    new Connector(() => joinGameData());
+    connection.socket?.send(joinGame());
     document.getElementById("join")!.style.display = "none"
     document.getElementById("leave")!.style.display = "block"
 }
 
-if (getCookieValue("playerId")) {
-    document.getElementById("leave")!.style.display = "block"
-    document.getElementById("join")!.style.display = "none"
-} else {
-    document.getElementById("leave")!.style.display = "none"
-    document.getElementById("join")!.style.display = "block"
-}
+// if (getCookieValue("playerId")) {
+//     document.getElementById("leave")!.style.display = "block"
+//     document.getElementById("join")!.style.display = "none"
+// } else {
+//     document.getElementById("leave")!.style.display = "none"
+//     document.getElementById("join")!.style.display = "block"
+// }
 
 document.getElementById("leave")!.onclick = () => {
     leaveGame()
