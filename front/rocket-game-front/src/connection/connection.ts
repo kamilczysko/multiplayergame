@@ -5,7 +5,7 @@ export class Connector {
     socket: WebSocket | undefined;
 
     constructor(joinFunction: () => Uint8Array) {
-        this.socket = new WebSocket("ws://localhost:60231/game");
+        this.socket = new WebSocket("ws://localhost:5656/game");
 
         this.socket.onopen = () => {
             console.log("Connection opened...");

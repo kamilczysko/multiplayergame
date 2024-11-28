@@ -126,6 +126,7 @@ class GameWorld {
 
         val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y - 200); //little secret with front
 
+        logger.info("MOON: "+moonData)
         return MapData(platformsData, moonData, mapHash);
     }
 

@@ -61,8 +61,8 @@ configure(subprojects) {
 }
 
 subprojects {
-  version = '$projectVersion'
-  ext.appName = 'RocketGame'
+  version = '1'
+  ext.appName = 'game'
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }

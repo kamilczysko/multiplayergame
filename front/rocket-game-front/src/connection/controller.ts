@@ -15,7 +15,7 @@ export async function readMessage(data: Blob) {
       break;
     case 0x02:
       console.log("Received players list...");
-      decodePlayersList(arrayBuffer);
+      // decodePlayersList(arrayBuffer);
       break;
     case 0x03:
       console.log("Remove player...");
@@ -47,23 +47,23 @@ function decodeNewUser(bytes: ArrayBuffer) {
   document.cookie = `playerId=${playerId};`;
 }
 
-function decodePlayersList(bytes: ArrayBuffer) {
-  const buffer = new Uint8Array(bytes).buffer;
-  const dataView = new DataView(buffer);
-  let mark = 1;
-  while (mark < dataView.byteLength) {
-    const numberOfBytesForName = dataView.getUint8(mark);
-    mark++;
-    const name = new TextDecoder("utf-8").decode(
-      new Uint8Array(buffer, mark, numberOfBytesForName)
-    );
-    mark = mark + numberOfBytesForName;
-    const playerId = new TextDecoder("utf-8").decode(
-      new Uint8Array(buffer, mark, 5)
-    );
-    mark += 5; //5 is equal to playerId.length
-  }
-}
+// function decodePlayersList(bytes: ArrayBuffer) {
+// const buffer = new Uint8Array(bytes).buffer;
+// const dataView = new DataView(buffer);
+// let mark = 1;
+// while (mark < dataView.byteLength) {
+//   const numberOfBytesForName = dataView.getUint8(mark);
+//   mark++;
+//   const name = new TextDecoder("utf-8").decode(
+//     new Uint8Array(buffer, mark, numberOfBytesForName)
+//   );
+//   mark = mark + numberOfBytesForName;
+//   const playerId = new TextDecoder("utf-8").decode(
+//     new Uint8Array(buffer, mark, 5)
+//   );
+//   mark += 5; //5 is equal to playerId.length
+// }
+// }
 
 function decodePlayerLeave(bytes: ArrayBuffer) {
   const buffer = new Uint8Array(bytes).buffer;

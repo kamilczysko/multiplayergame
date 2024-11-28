@@ -9,12 +9,12 @@ export let sendMessage: (buffer: ArrayBuffer) => void;
 const connection = new Connector(() => joinNewGameSession());
 
 
-function getCookieValue(key: string) {
-    return document.cookie
-        .split(";")
-        .filter((chunk) => chunk.includes(key))
-        .map((sessionChunk) => sessionChunk.split("=")[1])[0];
-}
+// function getCookieValue(key: string) {
+//     return document.cookie
+//         .split(";")
+//         .filter((chunk) => chunk.includes(key))
+//         .map((sessionChunk) => sessionChunk.split("=")[1])[0];
+// }
 
 document.getElementById("join")!.onclick = () => {
     connection.socket?.send(joinGame());

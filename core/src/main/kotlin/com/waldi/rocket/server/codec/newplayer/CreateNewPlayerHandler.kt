@@ -19,21 +19,24 @@ class CreateNewPlayerHandler(private val gameServerState: GameServerState) :
             ctx?.fireChannelRead(msg);
             return;
         }
+        logger.info("NEW PLAYER HANDLER")
         val channel = ctx?.channel() ?: return;
         val newSessionId = channel.id()?.asShortText() ?: return
 
         val newPlayer: CreateNewPlayer = msg
         val oldSession = newPlayer.sessionId;
         if (oldSession.isBlank()) {
+            logger.info { "Init new session"};
             val newPlayerWithoutGameplay = gameServerState.initNewPlayer(newSessionId, channel);
             ctx.writeAndFlush(CreateNewPlayer(newPlayerWithoutGameplay.gameId, newPlayerWithoutGameplay.playerSessionId));
         } else {
             val freshPlayer = gameServerState.refreshPlayer(oldSession, newSessionId, channel);
-            logger.info { "Create new player or refresh session for $freshPlayer" }
+            logger.info { "Refresh session for $freshPlayer" }
             ctx.writeAndFlush(CreateNewPlayer(freshPlayer.gameId, freshPlayer.playerSessionId));
-            logger.info { "Send map data to player ${freshPlayer.gameId}" }
         }
+        logger.info("PLAYER PLAYER")
         val mapData = gameServerState.getMapData();
+        logger.info("SEND DATA: "+mapData)
         ctx.writeAndFlush(mapData);
     }
 

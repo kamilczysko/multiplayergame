@@ -11,7 +11,7 @@ const containerFrontal = new PIXI.Container();
 const containerFire = new PIXI.Container();
 const backgroundContainer = new PIXI.Container();
 
-const app = new PIXI.Application({
+const app = new PIXI.Application<HTMLCanvasElement>({
   resizeTo: document.getElementById("gameplay")!,
   resolution: window.devicePixelRatio,
   autoDensity: true,
@@ -82,7 +82,7 @@ let moonIndicator: PIXI.Graphics | null | undefined = null;
 let elapsedTime = 0;
 let animationDuration = 1;
 
-app.ticker.add((delta) => {
+app.ticker.add(() => {
   elapsedTime += app.ticker.elapsedMS;
   const progress = Math.min(elapsedTime / animationDuration, 1);
   const myRocket = rockets[getCookieValue("playerId")];
