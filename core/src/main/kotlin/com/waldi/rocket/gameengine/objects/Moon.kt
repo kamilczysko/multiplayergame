@@ -15,7 +15,7 @@ class Moon(val x: Float,val y: Float, val radius: Float): WorldObject {
 
     init {
         moonBodyDef.type = BodyDef.BodyType.StaticBody;
-        moonBodyDef.position.set(x, y + 200);//little secret with front
+        moonBodyDef.position.set(x, y + 225);//little secret with front
         moonShape.radius = radius;
         moonFixtureDef.shape = moonShape
     }

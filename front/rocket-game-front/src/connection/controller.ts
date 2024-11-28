@@ -13,10 +13,6 @@ export async function readMessage(data: Blob) {
       console.log("My player initialization...");
       decodeNewUser(arrayBuffer);
       break;
-    case 0x02:
-      console.log("Received players list...");
-      // decodePlayersList(arrayBuffer);
-      break;
     case 0x03:
       console.log("Remove player...");
       decodePlayerLeave(arrayBuffer);
@@ -28,6 +24,8 @@ export async function readMessage(data: Blob) {
     case 0x05:
       decodeRockets(arrayBuffer);
       break;
+    default:
+      console.log("Other message")
   }
 }
 
@@ -46,24 +44,6 @@ function decodeNewUser(bytes: ArrayBuffer) {
   document.cookie = `sessionId=${sessionId};`;
   document.cookie = `playerId=${playerId};`;
 }
-
-// function decodePlayersList(bytes: ArrayBuffer) {
-// const buffer = new Uint8Array(bytes).buffer;
-// const dataView = new DataView(buffer);
-// let mark = 1;
-// while (mark < dataView.byteLength) {
-//   const numberOfBytesForName = dataView.getUint8(mark);
-//   mark++;
-//   const name = new TextDecoder("utf-8").decode(
-//     new Uint8Array(buffer, mark, numberOfBytesForName)
-//   );
-//   mark = mark + numberOfBytesForName;
-//   const playerId = new TextDecoder("utf-8").decode(
-//     new Uint8Array(buffer, mark, 5)
-//   );
-//   mark += 5; //5 is equal to playerId.length
-// }
-// }
 
 function decodePlayerLeave(bytes: ArrayBuffer) {
   const buffer = new Uint8Array(bytes).buffer;
@@ -86,7 +66,7 @@ function decodeMapInfo(bytes: ArrayBuffer) {
 
   const moon = {
     x: dataView.getInt8(1),
-    y: dataView.getUint8(2) + 400, //little secret with backend
+    y: dataView.getUint8(2) + 450, //little secret with backend
     radius: dataView.getUint8(3),
   };
   newLevel.setMoon(moon.x, moon.y, moon.radius);

@@ -63,7 +63,9 @@ class GameWorld {
             }
 
             if (rocket.y < -300) {
-                resetRocket(rocket)
+                if(!world.isLocked) {
+                    resetRocket(rocket)
+                }
             }
         }
 
@@ -78,7 +80,7 @@ class GameWorld {
         gameContactListener.update();
 //        batch.end();
 
-        world.step(1 / 30f, 5, 10);
+        world.step(1 / 35f, 5, 10);
 //        debug.render(world, camera.combined);
     }
 
@@ -124,7 +126,7 @@ class GameWorld {
             .map { PlatformData(it.x - it.width, it.y - it.height, it.width * 2, it.height * 2) }
             .toList();
 
-        val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y - 200); //little secret with front
+        val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y - 225); //little secret with front
 
         logger.info("MOON: "+moonData)
         return MapData(platformsData, moonData, mapHash);

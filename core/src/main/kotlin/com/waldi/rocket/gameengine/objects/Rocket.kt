@@ -30,7 +30,7 @@ class Rocket(val rocketId: String, private var initXPos: Float, private var init
         val angle = rocketBody.angle
         val thrustForce = Vector2(0.0f, THRUST_FORCE).rotateRad(angle);
         val rocketAbsolutePosition = rocketBody.worldCenter.add(Vector2(0.0f, ROCKET_HEIGHT / 2).rotateRad(angle));
-        rocketBody.applyForce(thrustForce, rocketAbsolutePosition, true);
+        rocketBody.applyForce(thrustForce, rocketAbsolutePosition, false);
         rocketFixtureDef.density *= fuel;
         fuel -= FUEL_CONSUMPTION;
     }
@@ -40,10 +40,6 @@ class Rocket(val rocketId: String, private var initXPos: Float, private var init
             return
         }
         rocketBody.setTransform(rocketBody.position, -angle);
-    }
-
-    fun isInMotion(): Boolean {
-        return rocketBody.linearVelocity.len() >= 0.001f || rocketBody.angularVelocity >= 0.01f;
     }
 
     override fun addToWorld(world: World) {
