@@ -44,7 +44,7 @@ class GameWorld {
     private val gameplayDataToSend = HashMap<Int, List<RocketData>>()
 
     private var timeElapsed = 0.0f;
-    private val threshold = 0.1f;
+    private val threshold = 0.05f;
 
     init {
 //        camera.position.set(0.0f, 130.0f, 0.0f);
@@ -181,5 +181,9 @@ class GameWorld {
 
     fun rotate(rocketId: String, angle: Float) {
         rocketIdToEntity[rocketId]?.rotate(angle);
+    }
+
+    fun allowedTransform(): Boolean {
+        return !world.isLocked;
     }
 }

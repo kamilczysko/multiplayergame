@@ -34,9 +34,7 @@ class CreateNewPlayerHandler(private val gameServerState: GameServerState) :
             logger.info { "Refresh session for $freshPlayer" }
             ctx.writeAndFlush(CreateNewPlayer(freshPlayer.gameId, freshPlayer.playerSessionId));
         }
-        logger.info("PLAYER PLAYER")
         val mapData = gameServerState.getMapData();
-        logger.info("SEND DATA: "+mapData)
         ctx.writeAndFlush(mapData);
     }
 

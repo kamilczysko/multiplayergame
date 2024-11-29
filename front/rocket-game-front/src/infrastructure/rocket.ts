@@ -144,7 +144,10 @@ export class Rocket {
 
     this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, recentStatus!.x, delta);
     this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, recentStatus!.y, delta);
-    this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
+
+    if (Math.abs(recentStatus!.angle - this.rocketSprite!.rotation) >= 0.1) {
+      this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
+    }
 
     this.pointsLabel!.x = this.rocketSprite!.x;
     this.pointsLabel!.y = this.rocketSprite!.y;
