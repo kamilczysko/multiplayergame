@@ -16,6 +16,6 @@ interface GameServerState {
     fun removePlayer(sessionId: String);
     fun setController(gameController: GameController);
     fun getMapData(): MapData?;
-    fun updateRocketsPositions(rocketData: List<RocketData>, timestamp: Int)
+    fun updateRocketsPositionsBatched(timestampToRocketDataList: Map<Int, List<RocketData>>)
     fun restartRocket(sessionId: String)
 }

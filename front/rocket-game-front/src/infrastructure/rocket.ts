@@ -3,7 +3,7 @@ import { Container, Sprite, Text, Texture } from "pixi.js";
 import { getRocketSprite } from "../graphics/rockets-pool";
 
 export class Rocket {
-  private rocketStatus: { x: number; y: number; angle: number, fuel: number, points: number }[] = [];
+  private rocketStatus: { x: number; y: number; angle: number, fuel: number, points: number, timestamp: number }[] = [];
   rocketId: string;
 
   private rocketSprite: Sprite | undefined;
@@ -14,7 +14,7 @@ export class Rocket {
   accelerating: boolean = false;
 
   constructor(x: number, y: number, angle: number, fuel: number, rocketId: string, points: number) {
-    this.rocketStatus = [{ x: x, y: y, angle: angle, fuel: fuel, points: points }];
+    this.rocketStatus = [{ x: x, y: y, angle: angle, fuel: fuel, points: points, timestamp: 0 }];
     this.rocketId = rocketId;
 
     this.initRocketSprite();
@@ -117,8 +117,9 @@ export class Rocket {
     );
   }
 
-  addRocketState(x: number, y: number, angle: number, fuel: number, points: number) {
-    this.rocketStatus.push({ x: x, y: y, angle: angle, fuel: fuel, points: points });
+  addRocketState(x: number, y: number, angle: number, fuel: number, points: number, timestamp: number) {
+    this.rocketStatus.push({ x: x, y: y, angle: angle, fuel: fuel, points: points, timestamp: timestamp });
+    this.rocketStatus.sort((a, b) => a.timestamp - b.timestamp)
   }
 
   animate(delta: number) {
@@ -140,6 +141,7 @@ export class Rocket {
     if (this.rocketStatus.length >= 50) {
       recentStatus = this.rocketStatus.shift(); //jump
     }
+
     this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, recentStatus!.x, delta);
     this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, recentStatus!.y, delta);
     this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
@@ -153,6 +155,7 @@ export class Rocket {
     this.fuelLabel!.y = this.rocketSprite!.y;
     this.fuelLabel!.rotation = this.rocketSprite!.rotation;
     this.fuelLabel!.text = `${recentStatus!.fuel}%`;
+
   }
 
   private interpolate(start: number, end: number, time: number) {

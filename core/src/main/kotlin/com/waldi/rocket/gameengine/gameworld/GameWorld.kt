@@ -1,5 +1,6 @@
 package com.waldi.rocket.gameengine.gameworld
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
 import com.waldi.rocket.gameengine.objects.Moon
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class GameWorld {
 
@@ -39,6 +41,11 @@ class GameWorld {
 
     private val executor = Executors.newFixedThreadPool(10);
 
+    private val gameplayDataToSend = HashMap<Int, List<RocketData>>()
+
+    private var timeElapsed = 0.0f;
+    private val threshold = 0.1f;
+
     init {
 //        camera.position.set(0.0f, 130.0f, 0.0f);
 //        camera.zoom += 0.1f;
@@ -56,7 +63,7 @@ class GameWorld {
     fun render() {
 //        batch.begin();
 //        font.draw(batch, "TEST", 510.0f, 1 * 20.0f + 15.0f);
-        for ((index, rocket) in rocketIdToEntity.values.withIndex()) {
+        for (rocket in rocketIdToEntity.values) {
 //            font.draw(batch, "${rocket.name} ${(rocket.fuel * 100).toInt()}%", 10.0f, index * 20.0f + 15.0f);
             if (rocket.isAccelerating) {
                 rocket.accelerate();
@@ -72,9 +79,17 @@ class GameWorld {
         val rocketsData = rocketIdToEntity.values.stream()
             .map { RocketData(it.x, it.y, it.angle, it.rocketId, it.fuel, it.points) }
             .collect(Collectors.toList())
-        executor.execute() {
-            gameTimeStamp++;
-            gameController.notifyAboutGameState(rocketsData, gameTimeStamp); //todo batching!!!
+
+        gameTimeStamp++;
+        gameplayDataToSend[gameTimeStamp] = rocketsData;
+
+        timeElapsed += Gdx.graphics.deltaTime;
+        if(timeElapsed >=  threshold) {
+            executor.execute() {
+                gameController.notifyAboutGameState(gameplayDataToSend);
+                timeElapsed = 0.0f;
+                gameplayDataToSend.clear();
+            }
         }
 
         gameContactListener.update();

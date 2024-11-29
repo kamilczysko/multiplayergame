@@ -85,8 +85,9 @@ class InMemoryGameServerState: GameServerState {
         sessionIdToPlayer.remove(sessionId);
     }
 
-    override fun updateRocketsPositions(rocketData: List<RocketData>, timestamp: Int) {
-        val data = encode(rocketData, timestamp);
+    override fun updateRocketsPositionsBatched(timestampToRocketDataList: Map<Int, List<RocketData>>) {
+
+        val data = encode(timestampToRocketDataList);
         try {
             sessionIdToPlayer.values.
             forEach{player: Player ->  player.playerChannel.writeAndFlush(BinaryWebSocketFrame(data.retain().duplicate())) }

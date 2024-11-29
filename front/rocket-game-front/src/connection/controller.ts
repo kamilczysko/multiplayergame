@@ -85,38 +85,40 @@ function decodeMapInfo(bytes: ArrayBuffer) {
   drawLevel(newLevel);
 }
 
-let timestamp = -1;
-
 function decodeRockets(bytes: ArrayBuffer) {
   const buffer = new Uint8Array(bytes).buffer;
   const dataView = new DataView(buffer);
-  let mark = 0;
-  const serverTimestamp = dataView.getUint32(++mark);
-  if (serverTimestamp < timestamp) {
-    return;
-  }
-  timestamp = serverTimestamp;
-  mark += 4;
+  let mark = 1;
   while (mark < dataView.byteLength) {
-    const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
-    mark += 5;
-    const x = dataView.getFloat64(mark);
-    mark += 8;
-    const y = dataView.getFloat64(mark);
-    mark += 8;
-    const angle = dataView.getInt8(mark) / 100 * Math.PI;
-    mark++;
-    const fuel = dataView.getUint8(mark);
-    mark++;
-    const points = dataView.getUint8(mark);
-    mark++;
+    const timestamp = dataView.getUint32(mark);
+    mark += 4;
+    const numberOfRocketsInBatch = dataView.getUint8(mark++);
+    if (numberOfRocketsInBatch == 0) {
+      continue;
+    }
+    for (let i = 0; i < numberOfRocketsInBatch; i++) {
+      const playerId = new TextDecoder("utf-8").decode(new Uint8Array(buffer, mark, 5));
+      mark += 5;
+      const x = dataView.getFloat64(mark);
+      mark += 8;
+      const y = dataView.getFloat64(mark);
+      mark += 8;
+      const angle = dataView.getInt8(mark) / 100 * Math.PI;
+      mark++;
+      const fuel = dataView.getUint8(mark);
+      mark++;
+      const points = dataView.getUint8(mark);
 
-    const rocket: Rocket = rockets[playerId];
-    if (!rocket) {
-      rockets[playerId] = new Rocket(x, y, angle, fuel, playerId, points);
-      addRocketToView(rockets[playerId]);
-    } else {
-      rocket.addRocketState(x, y, angle, fuel, points);
+
+      const rocket: Rocket = rockets[playerId];
+      if (!rocket) {
+        rockets[playerId] = new Rocket(x, y, angle, fuel, playerId, points);
+        addRocketToView(rockets[playerId]);
+      } else {
+        rocket.addRocketState(x, y, angle, fuel, points, timestamp);
+      }
+
+      mark++;
     }
   }
 }

@@ -80,15 +80,15 @@ let moonY = 0;
 let moonIndicator: PIXI.Graphics | null | undefined = null;
 
 let elapsedTime = 0;
-let animationDuration = 1;
+let stepDuration = 5;
 
 app.ticker.add(() => {
   elapsedTime += app.ticker.elapsedMS;
-  const progress = Math.min(elapsedTime / animationDuration, 1);
+  const progress = Math.min(elapsedTime / stepDuration, 1);
   const myRocket = rockets[getCookieValue("playerId")];
   if (myRocket) {
     myRocket.accelerating = accelerateRocket;
-    myRocket.animate(1);
+    myRocket.animate(progress);
 
     scale = lerp(scale, -38, 0.1);
     container.scale.set(scale);
@@ -130,7 +130,7 @@ app.ticker.add(() => {
 
   Object.values(rockets).forEach(rocket => {
     if (rocket?.rocketId != getCookieValue("playerId")) {
-      rocket?.animate(1);
+      rocket?.animate(progress);
     }
   });
 

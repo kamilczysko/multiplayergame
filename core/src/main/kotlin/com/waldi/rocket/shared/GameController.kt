@@ -25,8 +25,8 @@ class GameController() {
         return gameWorld.getMap();
     }
 
-    fun notifyAboutGameState(rocketData: List<RocketData>, timestamp: Int) {
-       gameServerState.updateRocketsPositions(rocketData, timestamp);
+    fun notifyAboutGameState(timestampToRocketDataList: Map<Int, List<RocketData>>) {
+        gameServerState.updateRocketsPositionsBatched(timestampToRocketDataList);
     }
 
     fun resetRocket(playerId: String) {
