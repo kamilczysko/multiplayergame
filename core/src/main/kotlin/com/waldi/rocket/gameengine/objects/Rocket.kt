@@ -2,8 +2,7 @@ package com.waldi.rocket.gameengine.objects
 
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
-import ktx.log.logger
-import kotlin.math.log
+import java.util.concurrent.ConcurrentLinkedQueue
 
 const val ROCKET_WIDTH = 0.5f;
 const val ROCKET_HEIGHT = 1.5f;
@@ -18,6 +17,8 @@ class Rocket(val rocketId: String, private var initXPos: Float, private var init
 
     private lateinit var rocketBody: Body;
     private lateinit var rocketFixtureDef: FixtureDef;
+
+    private val rotations = ConcurrentLinkedQueue<Float>();
 
     fun addPoint() {
         this.points++;
@@ -35,11 +36,16 @@ class Rocket(val rocketId: String, private var initXPos: Float, private var init
         fuel -= FUEL_CONSUMPTION;
     }
 
-    fun rotate(angle: Float) {
+    fun queueRotation(angle: Float) {
         if (rocketBody.linearVelocity.x == 0.0f || rocketBody.linearVelocity.y == 0.0f) {
             return
         }
-        rocketBody.setTransform(rocketBody.position, -angle);
+        rotations.add(angle);
+    }
+
+    fun executeRotation() {
+        val rotation = rotations.poll() ?: return;
+        rocketBody.setTransform(rocketBody.position, -rotation);
     }
 
     override fun addToWorld(world: World) {

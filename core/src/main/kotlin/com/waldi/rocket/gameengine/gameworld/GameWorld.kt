@@ -72,6 +72,8 @@ class GameWorld {
             if (rocket.y < -250) {
                 resetRocket(rocket)
             }
+
+            rocket.executeRotation();
         }
 
         val rocketsData = rocketIdToEntity.values.stream()
@@ -177,8 +179,12 @@ class GameWorld {
         rocketIdToEntity[rocketId]?.isAccelerating = false;
     }
 
+    fun addRotation(rocketId: String, angle: Float){
+
+    }
+
     fun rotate(rocketId: String, angle: Float) {
-        rocketIdToEntity[rocketId]?.rotate(angle);
+        rocketIdToEntity[rocketId]?.queueRotation(angle);
     }
 
     fun isLocked(): Boolean {
