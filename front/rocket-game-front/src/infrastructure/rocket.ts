@@ -127,16 +127,16 @@ export class Rocket {
     this.fire?.update(this.accelerating && this.rocketStatus[0]?.fuel > 0 ? 0.03 : 0.005);
     this.fire?.updateSpawnPos(this.rocketSprite!.x + 1.2 * Math.sin(this.rocketSprite!.rotation), this.rocketSprite!.y - 1.2 * Math.cos(this.rocketSprite!.rotation));
 
-    if (!this.rocketSprite || this.rocketStatus.length <= 1) {
+    if (!this.rocketSprite || this.rocketStatus.length == 0) {
       return;
     }
 
     let recentStatus = this.rocketStatus[0];
 
     console.log("length of steps: " + this.rocketStatus.length)
-    if (this.rocketStatus.length >= 10) {
-      this.rocketStatus.shift()!!; //jump
-    }
+    // if (this.rocketStatus.length >= 10) {
+    //   this.rocketStatus.shift()!!; //jump
+    // }
 
 
     this.rocketSprite!.x = this.lerp(this.rocketSprite!.x, recentStatus!.x, delta);
