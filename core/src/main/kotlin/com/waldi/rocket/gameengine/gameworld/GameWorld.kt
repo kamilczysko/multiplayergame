@@ -98,7 +98,7 @@ class GameWorld {
         gameContactListener.update();
 //        batch.end();
 
-        world.step(1/60f, 10, 10);
+        world.step(1/40f, 10, 10);
 //        debug.render(world, camera.combined);
     }
 
