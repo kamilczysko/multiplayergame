@@ -44,7 +44,7 @@ class GameWorld {
     private var gameplayDataToSend = HashMap<Int, List<RocketData>>()
 
     private var timeElapsed = 0.0f;
-    private val threshold = 0.08f;
+    private val threshold = 0.01f;
 
     init {
 //        camera.position.set(0.0f, 130.0f, 0.0f);
@@ -90,6 +90,7 @@ class GameWorld {
             timeElapsed = 0.0f;
 
             executor.execute() {
+                println("SEND PACKETS ${copy.size}")
                 gameController.notifyAboutGameState(copy);
             }
         }
