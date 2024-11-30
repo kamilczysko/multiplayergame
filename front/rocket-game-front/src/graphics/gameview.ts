@@ -80,7 +80,7 @@ let moonY = 0;
 let moonIndicator: PIXI.Graphics | null | undefined = null;
 
 let elapsedTime = 0;
-let stepDuration = 30;
+let stepDuration = 10;
 
 app.ticker.maxFPS = 120;
 app.ticker.add(() => {
