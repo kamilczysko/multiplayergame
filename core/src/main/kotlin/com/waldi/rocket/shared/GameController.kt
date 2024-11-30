@@ -26,7 +26,6 @@ class GameController() {
     }
 
     fun notifyAboutGameState(timestampToRocketDataList: Map<Int, List<RocketData>>) {
-        println("SEND ${timestampToRocketDataList.size} PACKETS")
         gameServerState.updateRocketsPositionsBatched(timestampToRocketDataList)
     }
 

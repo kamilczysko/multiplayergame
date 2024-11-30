@@ -119,7 +119,6 @@ export class Rocket {
 
   addRocketState(x: number, y: number, angle: number, fuel: number, points: number, timestamp: number) {
     this.rocketStatus.push({ x: x, y: y, angle: angle, fuel: fuel, points: points, timestamp: timestamp });
-    console.log("add state to rocekt: " + this.rocketStatus.length)
     this.rocketStatus.sort((a, b) => a.timestamp - b.timestamp)
   }
 
@@ -132,12 +131,6 @@ export class Rocket {
     }
 
     let recentStatus = this.rocketStatus[0];
-
-    console.log("length of steps: " + this.rocketStatus.length)
-    // if (this.rocketStatus.length >= 10) {
-    //   this.rocketStatus.shift()!!; //jump
-    // }
-
 
     this.rocketSprite!.x = this.lerp(this.rocketSprite!.x, recentStatus!.x, delta);
     this.rocketSprite!.y = this.lerp(this.rocketSprite!.y, recentStatus!.y, delta);
