@@ -44,7 +44,7 @@ class GameWorld {
     private var gameplayDataToSend = HashMap<Int, List<RocketData>>()
 
     private var timeElapsed = 0.0f;
-    private val threshold = 0.01f;
+    private val threshold = 0.05f;
 
     init {
 //        camera.position.set(0.0f, 130.0f, 0.0f);
@@ -98,7 +98,7 @@ class GameWorld {
         gameContactListener.update();
 //        batch.end();
 
-        world.step(1/40f, 10, 10);
+        world.step(1/30f, 10, 10);
 //        debug.render(world, camera.combined);
     }
 
