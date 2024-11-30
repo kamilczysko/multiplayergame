@@ -131,22 +131,17 @@ export class Rocket {
       return;
     }
 
-    let recentStatus = this.rocketStatus.shift()
+    let recentStatus = this.rocketStatus[0];
 
     console.log("length of steps: " + this.rocketStatus.length)
     if (this.rocketStatus.length >= 10) {
-      recentStatus = this.rocketStatus.shift()!!; //jump
-    }
-    if (this.rocketStatus.length >= 30) {
-      recentStatus = this.rocketStatus.shift()!!; //jump
-    }
-    if (this.rocketStatus.length >= 50) {
-      recentStatus = this.rocketStatus.shift()!!; //jump
+      this.rocketStatus.shift()!!; //jump
     }
 
-    this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, recentStatus!.x, delta);
-    this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, recentStatus!.y, delta);
-    this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
+
+    this.rocketSprite!.x = this.lerp(this.rocketSprite!.x, recentStatus!.x, delta);
+    this.rocketSprite!.y = this.lerp(this.rocketSprite!.y, recentStatus!.y, delta);
+    this.rocketSprite!.rotation = this.lerp(this.rocketSprite!.rotation, recentStatus!.angle, delta);
 
     this.pointsLabel!.x = this.rocketSprite!.x;
     this.pointsLabel!.y = this.rocketSprite!.y;
@@ -159,13 +154,13 @@ export class Rocket {
     this.fuelLabel!.text = `${recentStatus!.fuel}%`;
 
     if (delta == 1) {
-      // this.rocketStatus.shift();
+      this.rocketStatus.shift();
     }
 
   }
 
-  private interpolate(start: number, end: number, time: number) {
-    return (1 - time) * start + time * end;
+  private lerp(start: number, end: number, amt: number) {
+    return (1 - amt) * start + amt * end;
   }
 
   getRocketAcutalPosition() {

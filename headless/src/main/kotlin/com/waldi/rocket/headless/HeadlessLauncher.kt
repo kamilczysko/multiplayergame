@@ -11,6 +11,6 @@ import com.waldi.rocket.gameengine.MainHeadless
 fun main() {
     HeadlessApplication(MainHeadless(), HeadlessApplicationConfiguration().apply {
         // When this value is negative, Main#render() is never called:
-        updatesPerSecond = 120;
+        updatesPerSecond = 45;
     })
 }
