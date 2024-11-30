@@ -14,10 +14,10 @@ const backgroundContainer = new PIXI.Container();
 const app = new PIXI.Application<HTMLCanvasElement>({
   resizeTo: document.getElementById("gameplay")!,
   resolution: window.devicePixelRatio,
-  autoDensity: true,
+  // autoDensity: true,
   background: "#211753",
-  forceCanvas: false,
-  antialias: true
+  // forceCanvas: false,
+  // antialias: true
 });
 
 app.stage.eventMode = "static";
@@ -80,10 +80,13 @@ let moonY = 0;
 let moonIndicator: PIXI.Graphics | null | undefined = null;
 
 let elapsedTime = 0;
-let stepDuration = 5;
-
+let stepDuration = 1;
+app.ticker.maxFPS = 60;
 app.ticker.add(() => {
   elapsedTime += app.ticker.elapsedMS;
+  // if (elapsedTime < 15) {
+  //   return;
+  // }
   const progress = Math.min(elapsedTime / stepDuration, 1);
   const myRocket = rockets[getCookieValue("playerId")];
   if (myRocket) {

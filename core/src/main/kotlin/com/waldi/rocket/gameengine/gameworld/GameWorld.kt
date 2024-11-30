@@ -41,10 +41,10 @@ class GameWorld {
 
     private val executor = Executors.newFixedThreadPool(10);
 
-    private val gameplayDataToSend = HashMap<Int, List<RocketData>>()
+    private var gameplayDataToSend = HashMap<Int, List<RocketData>>()
 
     private var timeElapsed = 0.0f;
-    private val threshold = 0.05f;
+    private val threshold = 0.5f;
 
     init {
 //        camera.position.set(0.0f, 130.0f, 0.0f);
@@ -69,10 +69,8 @@ class GameWorld {
                 rocket.accelerate();
             }
 
-            if (rocket.y < -300) {
-                if(!world.isLocked) {
-                    resetRocket(rocket)
-                }
+            if (rocket.y < -250) {
+                resetRocket(rocket)
             }
         }
 
@@ -84,11 +82,13 @@ class GameWorld {
         gameplayDataToSend[gameTimeStamp] = rocketsData;
 
         timeElapsed += Gdx.graphics.deltaTime;
-        if(timeElapsed >=  threshold) {
+        if (timeElapsed >= threshold) {
+            val copy = java.util.HashMap(gameplayDataToSend)
+            gameplayDataToSend =  HashMap();
+            timeElapsed = 0.0f;
+
             executor.execute() {
-                gameController.notifyAboutGameState(gameplayDataToSend);
-                timeElapsed = 0.0f;
-                gameplayDataToSend.clear();
+                gameController.notifyAboutGameState(copy);
             }
         }
 
@@ -100,7 +100,6 @@ class GameWorld {
     }
 
     private fun scorePoint(rocketId: String) {
-        logger.info("ADD POINTTT")
         rocketIdToEntity[rocketId]?.addPoint()
         resetRocketById(rocketId);
     }
@@ -143,7 +142,6 @@ class GameWorld {
 
         val moonData = MoonData(moon!!.radius, moon!!.x, moon!!.y - 225); //little secret with front
 
-        logger.info("MOON: "+moonData)
         return MapData(platformsData, moonData, mapHash);
     }
 
@@ -183,7 +181,7 @@ class GameWorld {
         rocketIdToEntity[rocketId]?.rotate(angle);
     }
 
-    fun allowedTransform(): Boolean {
-        return !world.isLocked;
+    fun isLocked(): Boolean {
+        return world.isLocked;
     }
 }

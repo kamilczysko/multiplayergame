@@ -119,6 +119,7 @@ export class Rocket {
 
   addRocketState(x: number, y: number, angle: number, fuel: number, points: number, timestamp: number) {
     this.rocketStatus.push({ x: x, y: y, angle: angle, fuel: fuel, points: points, timestamp: timestamp });
+    console.log("add state to rocekt: " + this.rocketStatus.length)
     this.rocketStatus.sort((a, b) => a.timestamp - b.timestamp)
   }
 
@@ -126,28 +127,26 @@ export class Rocket {
     this.fire?.update(this.accelerating && this.rocketStatus[0]?.fuel > 0 ? 0.03 : 0.005);
     this.fire?.updateSpawnPos(this.rocketSprite!.x + 1.2 * Math.sin(this.rocketSprite!.rotation), this.rocketSprite!.y - 1.2 * Math.cos(this.rocketSprite!.rotation));
 
-    if (!this.rocketSprite || this.rocketStatus.length == 0) {
+    if (!this.rocketSprite || this.rocketStatus.length <= 1) {
       return;
     }
 
-    let recentStatus = this.rocketStatus.shift();
+    let recentStatus = this.rocketStatus.shift()
 
+    console.log("length of steps: " + this.rocketStatus.length)
     if (this.rocketStatus.length >= 10) {
-      recentStatus = this.rocketStatus.shift(); //jump
+      recentStatus = this.rocketStatus.shift()!!; //jump
     }
     if (this.rocketStatus.length >= 30) {
-      recentStatus = this.rocketStatus.shift(); //jump
+      recentStatus = this.rocketStatus.shift()!!; //jump
     }
     if (this.rocketStatus.length >= 50) {
-      recentStatus = this.rocketStatus.shift(); //jump
+      recentStatus = this.rocketStatus.shift()!!; //jump
     }
 
     this.rocketSprite!.x = this.interpolate(this.rocketSprite!.x, recentStatus!.x, delta);
     this.rocketSprite!.y = this.interpolate(this.rocketSprite!.y, recentStatus!.y, delta);
-
-    if (Math.abs(recentStatus!.angle - this.rocketSprite!.rotation) >= 0.1) {
-      this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
-    }
+    this.rocketSprite!.rotation = this.interpolate(this.rocketSprite!.rotation, recentStatus!.angle, delta);
 
     this.pointsLabel!.x = this.rocketSprite!.x;
     this.pointsLabel!.y = this.rocketSprite!.y;
@@ -158,6 +157,10 @@ export class Rocket {
     this.fuelLabel!.y = this.rocketSprite!.y;
     this.fuelLabel!.rotation = this.rocketSprite!.rotation;
     this.fuelLabel!.text = `${recentStatus!.fuel}%`;
+
+    if (delta == 1) {
+      // this.rocketStatus.shift();
+    }
 
   }
 

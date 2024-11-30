@@ -18,14 +18,15 @@ class SteeringHandler(private val gameWorld: GameWorld, private val gameServerSt
 
         val sessionId = ctx?.channel()?.id()?.asShortText() ?: return
         val rocketId = gameServerState.getPlayerBySessionId(sessionId)?.gameId ?: return;
+        if(gameWorld.isLocked()) {
+            return;
+        }
 
         if(msg.isAccelerating) {
             gameWorld.startAccelerating(rocketId);
         } else {
             gameWorld.stopAccelerating(rocketId);
         }
-        if(gameWorld.allowedTransform()) {
-            gameWorld.rotate(rocketId, msg.angle);
-        }
+        gameWorld.rotate(rocketId, msg.angle);
     }
 }
