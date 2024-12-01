@@ -28,6 +28,7 @@ fun bootstrapServer(gameServerState: GameServerState, gameWorld: GameWorld) {
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
         .childHandler(SocketChannelInitializer(gameServerState, gameWorld));
+
     try {
         val sync: ChannelFuture = bootstrap.bind().sync();
         sync.channel().closeFuture().sync();
