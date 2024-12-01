@@ -90,7 +90,6 @@ class GameWorld {
             timeElapsed = 0.0f;
 
             executor.execute() {
-                println("SEND PACKETS ${copy.size}")
                 gameController.notifyAboutGameState(copy);
             }
         }

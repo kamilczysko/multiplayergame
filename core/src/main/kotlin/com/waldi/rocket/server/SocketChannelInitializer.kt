@@ -23,12 +23,11 @@ import java.net.InetAddress
 class SocketChannelInitializer(private val gameServerState: GameServerState, private val gameWorld: GameWorld) : ChannelInitializer<SocketChannel>() {
 
     override fun initChannel(channel: SocketChannel) {
-        val host = InetAddress.getLocalHost();
         val pipeline = channel.pipeline();
         pipeline.addLast(HttpServerCodec());
         pipeline.addLast(ChunkedWriteHandler());
         pipeline.addLast(HttpObjectAggregator(8192));
-        pipeline.addLast(WebSocketServerProtocolHandler("ws://$host:5656/game", WEBSOCKET_PROTOCOL.toString(), true, 655360));
+        pipeline.addLast(WebSocketServerProtocolHandler("ws://localhost:5656/game", WEBSOCKET_PROTOCOL.toString(), true, 655360));
 
         pipeline.addLast(GameDecoder())
         pipeline.addLast(CreateNewPlayerEncoder())
