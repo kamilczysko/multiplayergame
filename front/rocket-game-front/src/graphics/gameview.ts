@@ -13,7 +13,7 @@ const backgroundContainer = new PIXI.Container();
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   resizeTo: document.getElementById("gameplay")!,
-  resolution: window.devicePixelRatio,
+//   resolution: window.devicePixelRatio,
   // autoDensity: true,
   background: "#211753",
   // forceCanvas: false,
